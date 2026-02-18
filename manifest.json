@@ -1,0 +1,15 @@
+{
+  "name": "Sanastopeli",
+  "short_name": "Sanastopeli",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0f0a2e",
+  "theme_color": "#0f0a2e",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
