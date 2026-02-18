@@ -926,5 +926,31 @@ answerInput.addEventListener('keydown', e => {
 updateDirUI();
 updateStartUI();
 </script>
+
+<div id="iosHint">
+  Lisää kotinäytölle: paina <strong>⎋ Jaa</strong> → <strong>Lisää Koti-valikkoon</strong>
+  <button onclick="this.parentElement.style.display='none'">✕</button>
+</div>
+<style>
+#iosHint {
+  display: none;
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+  background: rgba(15,10,46,0.92); backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: white; font-size: 13px; padding: 12px 16px;
+  border-radius: 14px; z-index: 999; width: 280px; text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+#iosHint button {
+  background: none; border: none; color: rgba(255,255,255,0.6);
+  font-size: 16px; cursor: pointer; margin-left: 8px;
+}
+</style>
+<script>
+  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = window.navigator.standalone === true;
+  if (isIos && !isStandalone) document.getElementById('iosHint').style.display = 'block';
+</script>
+  
 </body>
 </html>
