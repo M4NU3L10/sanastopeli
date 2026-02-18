@@ -1,0 +1,923 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sanastopeli</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --font: 'Outfit', sans-serif;
+  --radius-xl: 28px;
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --glass-bg: rgba(255,255,255,0.08);
+  --glass-bg-hover: rgba(255,255,255,0.14);
+  --glass-border: rgba(255,255,255,0.15);
+  --glass-blur: blur(24px) saturate(180%);
+  --text-primary: rgba(255,255,255,0.95);
+  --text-secondary: rgba(255,255,255,0.60);
+  --accent-pink: #ff6ec7;
+  --accent-blue: #6eb8ff;
+}
+
+html { height: 100%; }
+body {
+  font-family: var(--font);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 16px 120px;
+  background: linear-gradient(135deg,#1a1a2e,#16213e,#0f3460,#533483);
+  background-attachment: fixed;
+  transition: background 0.9s ease;
+}
+
+/* ── Background orbs ── */
+.bg-orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.22; animation: drift 20s ease-in-out infinite alternate; }
+.orb-1 { width: 520px; height: 520px; top: -140px; left: -120px; background: radial-gradient(circle,#a855f7,transparent 70%); }
+.orb-2 { width: 420px; height: 420px; bottom: -80px; right: -100px; background: radial-gradient(circle,#ec4899,transparent 70%); animation-duration: 26s; animation-delay: -9s; }
+.orb-3 { width: 320px; height: 320px; top: 42%; left: 52%; background: radial-gradient(circle,#60a5fa,transparent 70%); animation-duration: 23s; animation-delay: -5s; }
+@keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(45px,55px) scale(1.12); } }
+
+/* ── App wrapper ── */
+.app { position: relative; z-index: 1; width: 100%; max-width: 560px; padding-top: 68px; }
+
+/* ── Glass base ── */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.14);
+}
+
+/* ── Settings button (top-left) ── */
+#settingsBtn {
+  position: fixed; top: 14px; left: 14px; z-index: 300;
+  width: 46px; height: 46px; border-radius: 50%;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 21px; cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  transition: background 0.2s, transform 0.3s ease;
+  color: var(--text-primary);
+}
+#settingsBtn:hover { background: var(--glass-bg-hover); transform: scale(1.08) rotate(25deg); }
+#settingsBtn.open  { transform: scale(1.08) rotate(60deg); }
+
+/* ── Settings panel ── */
+#settingsPanel {
+  position: fixed; top: 70px; left: 14px; z-index: 300;
+  width: 270px;
+  background: rgba(15,8,35,0.65);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(40px) saturate(220%);
+  -webkit-backdrop-filter: blur(40px) saturate(220%);
+  border-radius: var(--radius-lg);
+  padding: 18px 16px;
+  box-shadow: 0 16px 60px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.1);
+  transform-origin: top left;
+  transform: scale(0.82) translateY(-6px);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1), opacity 0.22s ease;
+}
+#settingsPanel.open { transform: scale(1) translateY(0); opacity: 1; pointer-events: all; }
+
+.set-label {
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+.set-label + .set-label, .set-section { margin-top: 16px; }
+
+.swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+.swatch {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 2.5px solid transparent; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.45);
+  transition: transform 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+.swatch:hover { transform: scale(1.18); }
+.swatch.active { border-color: rgba(255,255,255,0.9); transform: scale(1.18); }
+
+/* Direction toggle row */
+.dir-row {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 11px 12px; cursor: pointer;
+  transition: background 0.2s; user-select: none;
+}
+.dir-row:hover { background: rgba(255,255,255,0.13); }
+.dir-row .dr-flags { font-size: 17px; white-space: nowrap; }
+.dir-row .dr-text { font-size: 13px; font-weight: 600; flex: 1; line-height: 1.2; }
+.dir-dot {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid var(--accent-pink);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: var(--accent-pink);
+  transition: background 0.2s; flex-shrink: 0;
+}
+.dir-row.reversed .dir-dot { background: var(--accent-pink); color: #fff; }
+
+/* ── Bottom nav ── */
+#bottomNav {
+  position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+  z-index: 300;
+  display: flex;
+  background: rgba(15,8,35,0.65);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(40px) saturate(220%);
+  -webkit-backdrop-filter: blur(40px) saturate(220%);
+  border-radius: 100px; padding: 5px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.nb {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 2px; padding: 9px 30px;
+  border-radius: 100px; border: none;
+  background: transparent; color: var(--text-secondary);
+  font-family: var(--font); font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: background 0.2s, color 0.2s;
+  white-space: nowrap; user-select: none;
+}
+.nb .ni { font-size: 22px; line-height: 1; }
+.nb.active { background: rgba(255,255,255,0.15); color: var(--text-primary); box-shadow: inset 0 1px 0 rgba(255,255,255,0.15); }
+.nb:hover:not(.active) { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.8); }
+
+/* ── Overlay ── */
+#overlay { display: none; position: fixed; inset: 0; z-index: 200; }
+#overlay.open { display: block; }
+
+/* ── Screens ── */
+.screen { display: none; }
+.screen.active { display: block; animation: fadeUp 0.32s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ===== START SCREEN ===== */
+.start-inner { padding: 52px 36px; text-align: center; }
+.start-h1 { font-size: clamp(24px,6vw,36px); font-weight: 800; line-height: 1.15; margin-bottom: 10px; }
+.start-h1 span { background: linear-gradient(130deg,#ff6ec7,#6eb8ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.lang-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);
+  border-radius: 100px; padding: 5px 16px; font-size: 14px; font-weight: 600;
+  margin-bottom: 22px;
+}
+.start-desc { color: var(--text-secondary); font-size: 15px; line-height: 1.6; margin-bottom: 34px; }
+.btn-go {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg,#ff6ec7,#b06eff); color: #fff;
+  font-family: var(--font); font-weight: 700; font-size: 18px;
+  padding: 16px 44px; border-radius: 100px; border: none; cursor: pointer;
+  box-shadow: 0 4px 30px rgba(255,110,199,0.42);
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.btn-go:hover  { transform: translateY(-2px) scale(1.03); box-shadow: 0 8px 40px rgba(255,110,199,0.55); }
+.btn-go:active { transform: scale(0.97); }
+
+/* ===== GAME SCREEN ===== */
+.game-inner { padding: 26px 26px 22px; }
+
+.prog-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary); font-weight: 600; margin-bottom: 5px; }
+.prog-track { height: 5px; background: rgba(255,255,255,0.12); border-radius: 100px; margin-bottom: 22px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg,#6eb8ff,#b06eff,#ff6ec7); transition: width 0.55s cubic-bezier(.4,0,.2,1); }
+
+.dir-hint { text-align: center; font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 10px; }
+
+.word-card {
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: var(--radius-lg);
+  padding: 30px 20px; text-align: center; margin-bottom: 20px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.word-text { font-size: clamp(19px,5vw,29px); font-weight: 700; line-height: 1.35; }
+
+/* Write mode */
+#answerInput {
+  width: 100%;
+  background: rgba(255,255,255,0.09);
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  font-family: var(--font); font-size: 17px; font-weight: 500;
+  color: var(--text-primary); outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  margin-bottom: 12px;
+}
+#answerInput::placeholder { color: rgba(255,255,255,0.32); }
+#answerInput:focus { border-color: rgba(255,110,199,0.65); background: rgba(255,255,255,0.13); }
+#answerInput:disabled { opacity: 0.65; }
+
+/* Multiple choice */
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.choice {
+  background: rgba(255,255,255,0.08);
+  border: 1.5px solid rgba(255,255,255,0.14);
+  border-radius: var(--radius-md);
+  padding: 14px 10px;
+  font-family: var(--font); font-size: 14.5px; font-weight: 600;
+  color: var(--text-primary); cursor: pointer; text-align: center;
+  line-height: 1.3; min-height: 58px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, border-color 0.15s, transform 0.12s;
+}
+.choice:hover:not(:disabled) { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.3); transform: scale(1.03); }
+.choice:active:not(:disabled) { transform: scale(0.97); }
+.choice:disabled { cursor: default; }
+.choice.correct { background: rgba(74,222,128,0.18); border-color: #4ade80; color: #4ade80; }
+.choice.wrong   { background: rgba(248,113,113,0.18); border-color: #f87171; color: #f87171; }
+.choice.dim     { opacity: 0.42; }
+
+/* Feedback */
+.fb {
+  border-radius: var(--radius-md); padding: 13px 16px;
+  text-align: center; font-weight: 600; font-size: 14.5px; margin-bottom: 12px;
+  line-height: 1.4; display: none;
+}
+.fb.show { display: block; animation: pop 0.22s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes pop { from { transform: scale(0.88); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.fb.ok   { background: rgba(74,222,128,0.14); border: 1px solid rgba(74,222,128,0.4); color: #4ade80; }
+.fb.warn { background: rgba(251,191,36,0.14); border: 1px solid rgba(251,191,36,0.4); color: #fbbf24; }
+.fb.err  { background: rgba(248,113,113,0.14); border: 1px solid rgba(248,113,113,0.4); color: #f87171; }
+
+/* Action buttons */
+.btn-check {
+  width: 100%; padding: 14px; border: none; border-radius: var(--radius-md);
+  font-family: var(--font); font-size: 16px; font-weight: 700; cursor: pointer;
+  background: linear-gradient(135deg,#ff6ec7,#b06eff); color: #fff;
+  box-shadow: 0 4px 20px rgba(255,110,199,0.3);
+  transition: transform 0.14s, box-shadow 0.14s;
+}
+.btn-check:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(255,110,199,0.48); }
+.btn-check:active { transform: scale(0.98); }
+.btn-next {
+  width: 100%; padding: 14px; border-radius: var(--radius-md); cursor: pointer;
+  font-family: var(--font); font-size: 16px; font-weight: 700;
+  background: rgba(110,184,255,0.16); border: 1px solid rgba(110,184,255,0.32);
+  color: var(--accent-blue);
+  transition: background 0.15s;
+  display: none;
+}
+.btn-next:hover { background: rgba(110,184,255,0.26); }
+.btn-next.visible { display: block; }
+
+/* ===== RESULTS SCREEN ===== */
+.results-inner { padding: 52px 32px; text-align: center; }
+.res-emoji { font-size: 70px; margin-bottom: 14px; display: block; animation: bounceIn 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes bounceIn { from { transform: scale(0.25); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.res-title { font-size: 27px; font-weight: 800; margin-bottom: 18px; }
+.res-score { font-size: 56px; font-weight: 800; background: linear-gradient(135deg,#4ade80,#6eb8ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.res-pct  { font-size: 21px; color: var(--text-secondary); margin-bottom: 6px; }
+.res-msg  { font-size: 16px; color: var(--text-secondary); margin-bottom: 30px; }
+.res-btns { display: flex; flex-direction: column; gap: 10px; }
+.btn-res {
+  padding: 13px 24px; border-radius: 100px;
+  font-family: var(--font); font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; border: none;
+}
+.btn-res.prim { background: linear-gradient(135deg,#ff6ec7,#b06eff); color: #fff; box-shadow: 0 4px 20px rgba(255,110,199,0.3); }
+.btn-res.prim:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(255,110,199,0.48); }
+.btn-res.sec { background: rgba(255,255,255,0.09); border: 1px solid var(--glass-border); color: var(--text-primary); }
+.btn-res.sec:hover { background: rgba(255,255,255,0.15); }
+
+/* ── Quit game button (only visible during game) ── */
+.btn-quit {
+  width: 100%; margin-top: 14px; padding: 10px 14px;
+  border-radius: var(--radius-md); border: 1px solid rgba(248,113,113,0.35);
+  background: rgba(248,113,113,0.12); color: #f87171;
+  font-family: var(--font); font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: background 0.2s;
+  display: none;
+}
+.btn-quit:hover { background: rgba(248,113,113,0.22); }
+.btn-quit.visible { display: block; }
+
+/* ── Utilities ── */
+.hidden { display: none !important; }
+
+/* ── Responsive ── */
+@media (max-width: 420px) {
+  body { padding: 12px 12px 120px; }
+  .game-inner { padding: 20px 16px 18px; }
+  .choices { grid-template-columns: 1fr; }
+  .nb { padding: 9px 22px; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-orbs" aria-hidden="true">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<!-- Settings button -->
+<button id="settingsBtn" aria-label="Asetukset" aria-expanded="false">⚙️</button>
+
+<!-- Click-outside overlay -->
+<div id="overlay"></div>
+
+<!-- Settings panel -->
+<div id="settingsPanel" role="dialog" aria-label="Asetukset">
+  <div class="set-label">Taustaväri</div>
+  <div class="swatches" id="swatchWrap"></div>
+
+  <!-- Hidden during active game -->
+  <div id="dirSection">
+    <div class="set-label set-section">Käännössuunta</div>
+    <div class="dir-row" id="dirRow" role="button" tabindex="0" aria-label="Vaihda käännössuunta">
+      <span class="dr-flags" id="drFlags"></span>
+      <span class="dr-text"  id="drText"></span>
+      <span class="dir-dot"  id="dirDot">↔</span>
+    </div>
+  </div>
+
+  <!-- Only visible during active game -->
+  <button class="btn-quit" id="btnQuit">✕ Lopeta peli</button>
+</div>
+
+<!-- Main -->
+<main class="app">
+
+  <!-- START -->
+  <section class="screen active glass" id="startScreen">
+    <div class="start-inner">
+      <h1 class="start-h1"><span id="startH1"></span></h1>
+      <div class="lang-pill" id="langPill"></div>
+      <p class="start-desc" id="startDesc"></p>
+      <button class="btn-go" id="btnGo">Aloita 🚀</button>
+    </div>
+  </section>
+
+  <!-- GAME -->
+  <section class="screen glass" id="gameScreen">
+    <div class="game-inner">
+      <div class="prog-row">
+        <span id="progTxt"></span>
+        <span id="scoreTxt"></span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+
+      <div class="dir-hint" id="dirHint"></div>
+
+      <div class="word-card">
+        <div class="word-text" id="wordTxt"></div>
+      </div>
+
+      <!-- Write -->
+      <div id="writeWrap">
+        <input id="answerInput" type="text" autocomplete="off" autocorrect="off"
+               autocapitalize="off" spellcheck="false" placeholder="Kirjoita vastaus…">
+      </div>
+
+      <!-- Choice -->
+      <div id="choiceWrap" class="hidden">
+        <div class="choices" id="choicesGrid"></div>
+      </div>
+
+      <div class="fb" id="fb"></div>
+
+      <button class="btn-check" id="btnCheck">Tarkista ✓</button>
+      <button class="btn-next"  id="btnNext">Seuraava ➡</button>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="screen glass" id="resultsScreen">
+    <div class="results-inner">
+      <span class="res-emoji" id="resEmoji"></span>
+      <h2 class="res-title">Peli päättyi!</h2>
+      <div class="res-score" id="resScore"></div>
+      <div class="res-pct"   id="resPct"></div>
+      <div class="res-msg"   id="resMsg"></div>
+      <div class="res-btns">
+        <button class="btn-res prim" id="btnRestart">Pelaa uudelleen 🔄</button>
+        <button class="btn-res sec hidden" id="btnWrong"></button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Bottom nav -->
+<nav id="bottomNav" aria-label="Pelimuoto">
+  <button class="nb" data-mode="multiple" id="nbMultiple">
+    <span class="ni">🎯</span>Monivalinta
+  </button>
+  <button class="nb active" data-mode="write" id="nbWrite">
+    <span class="ni">✏️</span>Kirjoitus
+  </button>
+</nav>
+
+<script>
+/* ================================================================
+   VOCABULARY  –  muokkaa tätä osiota lisätäksesi sanoja
+   ================================================================
+   LANGUAGE_CONFIG:
+     sourceLanguage / targetLanguage  = kielen nimi tekstissä
+     sourceFlagEmoji / targetFlagEmoji = lippu-emoji
+================================================================ */
+const LANG = {
+  sourceLanguage:   'Suomi',
+  targetLanguage:   'Saksa',
+  sourceFlagEmoji:  '🇫🇮',
+  targetFlagEmoji:  '🇩🇪',
+};
+
+/* Jokainen sana-objekti:
+   source  = lähdekielen ilmaisu
+   target  = kohdekielen ilmaisu (artikkeli mukana, esim. "der Gewinn")
+   article = pelkkä artikkeli tai null
+   word    = kohdekielen sana ilman artikkelia
+*/
+const VOCAB = [
+  { source:"Palkinto kahdelle",                         target:"Gewinn für zwei",                             article:null,  word:"Gewinn für zwei" },
+  { source:"voitto, palkinto",                          target:"der Gewinn",                                  article:"der", word:"Gewinn" },
+  { source:"Karoline voitti ensimmäisen palkinnon.",    target:"Karoline hat den ersten Preis gewonnen.",     article:null,  word:"Karoline hat den ersten Preis gewonnen." },
+  { source:"palkinto; hinta",                           target:"der Preis",                                   article:"der", word:"Preis" },
+  { source:"kilpailu",                                  target:"der Wettbewerb",                              article:"der", word:"Wettbewerb" },
+  { source:"voittaa",                                   target:"gewinnen",                                    article:null,  word:"gewinnen" },
+  { source:"Hän soittaa (poika) ystävälleen Erikille.", target:"Sie ruft ihren Freund Erik an.",              article:null,  word:"Sie ruft ihren Freund Erik an." },
+  { source:"soittaa puhelimella",                       target:"anrufen",                                     article:null,  word:"anrufen" },
+  { source:"kulta, aarre",                              target:"der Schatz",                                  article:"der", word:"Schatz" },
+  { source:"jotain tosi mieletöntä",                    target:"etwas total Krasses",                         article:null,  word:"etwas total Krasses" },
+  { source:"mieletön, huikea, upea",                    target:"krass",                                       article:null,  word:"krass" },
+  { source:"kertoa",                                    target:"erzählen",                                    article:null,  word:"erzählen" },
+  { source:"tietää",                                    target:"wissen",                                      article:null,  word:"wissen" },
+  { source:"tosi siistiä",                              target:"megageil",                                    article:null,  word:"megageil" },
+  { source:"Minä iloitsen puolestasi!",                 target:"Ich freue mich für dich!",                   article:null,  word:"Ich freue mich für dich!" },
+  { source:"iloita",                                    target:"sich freuen",                                 article:null,  word:"sich freuen" },
+  { source:"Olet todella ansainnut sen!",               target:"Du hast es echt verdient!",                  article:null,  word:"Du hast es echt verdient!" },
+  { source:"aito; tässä: todella",                      target:"echt",                                        article:null,  word:"echt" },
+  { source:"ansaita",                                   target:"verdienen",                                   article:null,  word:"verdienen" },
+  { source:"vielä",                                     target:"noch",                                        article:null,  word:"noch" },
+  { source:"matka",                                     target:"die Reise",                                   article:"die", word:"Reise" },
+  { source:"Itävaltaan",                                target:"nach Österreich",                             article:null,  word:"nach Österreich" },
+  { source:"Donauinselfest-festareille",                target:"zum Donauinselfest",                          article:null,  word:"zum Donauinselfest" },
+  { source:"Tonava",                                    target:"die Donau",                                   article:"die", word:"Donau" },
+  { source:"saari",                                     target:"die Insel",                                   article:"die", word:"Insel" },
+  { source:"juhla",                                     target:"das Fest",                                    article:"das", word:"Fest" },
+  { source:"sisältäen",                                 target:"inklusive",                                   article:null,  word:"inklusive" },
+  { source:"backstagepassi",                            target:"der Backstage-Pass",                          article:"der", word:"Backstage-Pass" },
+  { source:"siellä",                                    target:"dort",                                        article:null,  word:"dort" },
+  { source:"bändi",                                     target:"die Band",                                    article:"die", word:"Band" },
+  { source:"jotakin on jossakin",                       target:"es gibt",                                     article:null,  word:"es gibt" },
+  { source:"valtava",                                   target:"gigantisch",                                  article:null,  word:"gigantisch" },
+  { source:"ilotulitus",                                target:"das Feuerwerk",                               article:"das", word:"Feuerwerk" },
+  { source:"parasta",                                   target:"das Beste",                                   article:"das", word:"Beste" },
+  { source:"kesällä",                                   target:"im Sommer",                                   article:null,  word:"im Sommer" },
+  { source:"kesä",                                      target:"der Sommer",                                  article:"der", word:"Sommer" },
+  { source:"tänä vuonna",                               target:"dieses Jahr",                                 article:null,  word:"dieses Jahr" },
+  { source:"vuosi",                                     target:"das Jahr",                                    article:"das", word:"Jahr" },
+  { source:"ulkona",                                    target:"im Freien",                                   article:null,  word:"im Freien" },
+  { source:"toivottavasti",                             target:"hoffentlich",                                 article:null,  word:"hoffentlich" },
+  { source:"sataa",                                     target:"regnen",                                      article:null,  word:"regnen" },
+  { source:"kaverini olivat",                           target:"meine Kumpels waren",                         article:null,  word:"meine Kumpels waren" },
+  { source:"kaveri",                                    target:"der Kumpel",                                  article:"der", word:"Kumpel" },
+  { source:"viime vuonna",                              target:"letztes Jahr",                                article:null,  word:"letztes Jahr" },
+  { source:"heinäkuussa",                               target:"im Juli",                                     article:null,  word:"im Juli" },
+  { source:"heinäkuu",                                  target:"der Juli",                                    article:"der", word:"Juli" },
+  { source:"valitettavasti",                            target:"leider",                                      article:null,  word:"leider" },
+  { source:"sää",                                       target:"das Wetter",                                  article:"das", word:"Wetter" },
+  { source:"Heillä oli hauskaa.",                       target:"Sie hatten Spaß.",                            article:null,  word:"Sie hatten Spaß." },
+  { source:"olla hauskaa",                              target:"Spaß haben",                                  article:null,  word:"Spaß haben" },
+  { source:"siitä huolimatta",                          target:"trotzdem",                                    article:null,  word:"trotzdem" },
+  { source:"joskus, kerran",                            target:"mal",                                         article:null,  word:"mal" },
+  { source:"sinne",                                     target:"dahin",                                       article:null,  word:"dahin" },
+  { source:"jo; tässä: joo, toki, miksipä ei",         target:"schon",                                       article:null,  word:"schon" },
+  { source:"kahdelle henkilölle",                       target:"für zwei Personen",                           article:null,  word:"für zwei Personen" },
+  { source:"henkilö",                                   target:"die Person",                                  article:"die", word:"Person" },
+  { source:"sinut; sinua",                              target:"dich",                                        article:null,  word:"dich" },
+  { source:"ottaa mukaan",                              target:"mitnehmen",                                   article:null,  word:"mitnehmen" },
+  { source:"Oletko tosissasi?",                         target:"Ist das dein Ernst?",                         article:null,  word:"Ist das dein Ernst?" },
+  { source:"paras (tyttö)ystävä",                       target:"die beste Freundin",                          article:"die", word:"beste Freundin" },
+  { source:"maailmassa",                                target:"auf der Welt",                                article:null,  word:"auf der Welt" },
+  { source:"maailma",                                   target:"die Welt",                                    article:"die", word:"Welt" },
+  { source:"ilman sinua",                               target:"ohne dich",                                   article:null,  word:"ohne dich" },
+  { source:"Se ei ole ollenkaan hauskaa!",              target:"Das macht keinen Spaß!",                      article:null,  word:"Das macht keinen Spaß!" },
+  { source:"jokin on hauskaa",                          target:"Spaß machen",                                 article:null,  word:"Spaß machen" },
+  { source:"tapaamme (toisemme)",                       target:"wir treffen uns",                             article:null,  word:"wir treffen uns" },
+  { source:"tavata",                                    target:"treffen",                                     article:null,  word:"treffen" },
+  { source:"suunnitella",                               target:"planen",                                      article:null,  word:"planen" },
+  { source:"Se sopii.",                                 target:"Das geht.",                                   article:null,  word:"Das geht." },
+  { source:"no sitten",                                 target:"also dann",                                   article:null,  word:"also dann" },
+  { source:"Huomiseen!",                                target:"Bis morgen!",                                 article:null,  word:"Bis morgen!" },
+  { source:"Nähdään pian!",                             target:"Bis bald!",                                   article:null,  word:"Bis bald!" },
+];
+
+/* ================================================================
+   GRADIENT THEMES
+================================================================ */
+const GRADS = [
+  { name:"Kosminen",    bg:"linear-gradient(135deg,#1a1a2e,#16213e,#0f3460,#533483)", sw:"linear-gradient(135deg,#533483,#0f3460)" },
+  { name:"Merivirta",   bg:"linear-gradient(135deg,#0d2137,#0a4a6e,#0a7a6b)",         sw:"linear-gradient(135deg,#0a7a6b,#0a4a6e)" },
+  { name:"Auringonlasku",bg:"linear-gradient(135deg,#2d0a1e,#7b1a4b,#c0392b)",        sw:"linear-gradient(135deg,#c0392b,#7b1a4b)" },
+  { name:"Metsä",       bg:"linear-gradient(135deg,#0d1b2a,#1b4332,#2d6a4f)",         sw:"linear-gradient(135deg,#2d6a4f,#1b4332)" },
+  { name:"Kristalli",   bg:"linear-gradient(135deg,#1a0533,#4a0080,#9b00d3)",          sw:"linear-gradient(135deg,#9b00d3,#4a0080)" },
+];
+
+/* ================================================================
+   STATE
+================================================================ */
+const S = {
+  mode:     'write',   // 'write' | 'multiple'
+  reversed: false,
+  gradIdx:  0,
+  words:    [],
+  wrong:    [],
+  idx:      0,
+  score:    0,
+  done:     false,     // current question answered?
+};
+
+/* ================================================================
+   DOM
+================================================================ */
+const el = id => document.getElementById(id);
+
+const settingsBtn  = el('settingsBtn');
+const settingsPanel= el('settingsPanel');
+const overlay      = el('overlay');
+const swatchWrap   = el('swatchWrap');
+const dirRow       = el('dirRow');
+const drFlags      = el('drFlags');
+const drText       = el('drText');
+const dirDot       = el('dirDot');
+
+const startScreen  = el('startScreen');
+const gameScreen   = el('gameScreen');
+const resultsScreen= el('resultsScreen');
+const startH1      = el('startH1');
+const langPill     = el('langPill');
+const startDesc    = el('startDesc');
+
+const progTxt      = el('progTxt');
+const scoreTxt     = el('scoreTxt');
+const progFill     = el('progFill');
+const dirHint      = el('dirHint');
+const wordTxt      = el('wordTxt');
+const writeWrap    = el('writeWrap');
+const choiceWrap   = el('choiceWrap');
+const answerInput  = el('answerInput');
+const choicesGrid  = el('choicesGrid');
+const fb           = el('fb');
+const btnCheck     = el('btnCheck');
+const btnNext      = el('btnNext');
+
+const resEmoji     = el('resEmoji');
+const resScore     = el('resScore');
+const resPct       = el('resPct');
+const resMsg       = el('resMsg');
+const btnRestart   = el('btnRestart');
+const btnWrong     = el('btnWrong');
+const btnQuit      = el('btnQuit');
+
+const nbMultiple   = el('nbMultiple');
+const nbWrite      = el('nbWrite');
+
+/* ================================================================
+   HELPERS
+================================================================ */
+function shuffle(a) { return [...a].sort(() => Math.random() - 0.5); }
+function norm(s)    { return s ? s.toLowerCase().replace(/\s+/g,' ').trim() : ''; }
+
+function showScreen(name) {
+  [startScreen, gameScreen, resultsScreen].forEach(s => s.classList.remove('active'));
+  ({ start: startScreen, game: gameScreen, results: resultsScreen })[name].classList.add('active');
+
+  const inGame = name === 'game';
+  // Bottom nav: visible only outside game
+  el('bottomNav').classList.toggle('hidden', inGame);
+  // Direction toggle: hidden during game
+  el('dirSection').classList.toggle('hidden', inGame);
+  // Quit button: visible only during game
+  el('btnQuit').classList.toggle('visible', inGame);
+}
+
+function question(w) { return S.reversed ? w.target : w.source; }
+function answer(w)   { return S.reversed ? w.source : w.target; }
+function answerCore(w) {
+  if (S.reversed) return w.source;
+  return w.word;
+}
+
+/* ================================================================
+   SETTINGS — GRADIENTS
+================================================================ */
+GRADS.forEach((g, i) => {
+  const sw = document.createElement('div');
+  sw.className = 'swatch' + (i === 0 ? ' active' : '');
+  sw.style.background = g.sw;
+  sw.title = g.name;
+  sw.setAttribute('role', 'button');
+  sw.setAttribute('tabindex', '0');
+  sw.addEventListener('click', () => setGrad(i));
+  sw.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') setGrad(i); });
+  swatchWrap.appendChild(sw);
+});
+
+function setGrad(i) {
+  S.gradIdx = i;
+  document.body.style.background = GRADS[i].bg;
+  document.body.style.backgroundAttachment = 'fixed';
+  swatchWrap.querySelectorAll('.swatch').forEach((s, j) => s.classList.toggle('active', j === i));
+}
+
+/* ================================================================
+   SETTINGS — PANEL OPEN / CLOSE
+================================================================ */
+function openSettings() {
+  settingsPanel.classList.add('open');
+  settingsBtn.classList.add('open');
+  settingsBtn.setAttribute('aria-expanded','true');
+  overlay.classList.add('open');
+}
+function closeSettings() {
+  settingsPanel.classList.remove('open');
+  settingsBtn.classList.remove('open');
+  settingsBtn.setAttribute('aria-expanded','false');
+  overlay.classList.remove('open');
+}
+
+settingsBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  settingsPanel.classList.contains('open') ? closeSettings() : openSettings();
+});
+overlay.addEventListener('click', closeSettings);
+
+/* ================================================================
+   SETTINGS — DIRECTION TOGGLE
+================================================================ */
+function updateDirUI() {
+  const { sourceLanguage:sl, targetLanguage:tl, sourceFlagEmoji:sf, targetFlagEmoji:tf } = LANG;
+  if (S.reversed) {
+    drFlags.textContent = `${tf} → ${sf}`;
+    drText.textContent  = `${tl} → ${sl}`;
+    dirRow.classList.add('reversed');
+  } else {
+    drFlags.textContent = `${sf} → ${tf}`;
+    drText.textContent  = `${sl} → ${tl}`;
+    dirRow.classList.remove('reversed');
+  }
+}
+
+function updateStartUI() {
+  const { sourceLanguage:sl, targetLanguage:tl, sourceFlagEmoji:sf, targetFlagEmoji:tf } = LANG;
+  if (S.reversed) {
+    startH1.textContent  = `${tl}–${sl} Sanastopeli`;
+    langPill.innerHTML   = `${tf} ${tl} &nbsp;→&nbsp; ${sl} ${sf}`;
+  } else {
+    startH1.textContent  = `${sl}–${tl} Sanastopeli`;
+    langPill.innerHTML   = `${sf} ${sl} &nbsp;→&nbsp; ${tl} ${tf}`;
+  }
+  const mode = S.mode === 'write' ? 'kirjoittamalla' : 'monivalinnalla';
+  const art  = !S.reversed ? '<br>Saat pisteen, vaikka artikkeli unohtuisi!' : '';
+  startDesc.innerHTML = `Harjoittele sanastoa ${mode}.${art}`;
+}
+
+dirRow.addEventListener('click', () => {
+  S.reversed = !S.reversed;
+  updateDirUI();
+  updateStartUI();
+});
+dirRow.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dirRow.click(); }
+});
+
+/* ================================================================
+   BOTTOM NAV
+================================================================ */
+[nbMultiple, nbWrite].forEach(btn => {
+  btn.addEventListener('click', () => {
+    S.mode = btn.dataset.mode;
+    nbMultiple.classList.toggle('active', S.mode === 'multiple');
+    nbWrite.classList.toggle('active',    S.mode === 'write');
+    updateStartUI();
+  });
+});
+
+/* ================================================================
+   GAME — START
+================================================================ */
+function startGame(wordsOverride) {
+  S.words = shuffle(wordsOverride || VOCAB);
+  S.wrong = [];
+  S.idx   = 0;
+  S.score = 0;
+  S.done  = false;
+  closeSettings();
+  showScreen('game');
+  renderWord();
+}
+
+/* ================================================================
+   GAME — RENDER WORD
+================================================================ */
+function renderWord() {
+  const w = S.words[S.idx];
+  S.done  = false;
+
+  // Progress bar
+  progTxt.textContent  = `Sana ${S.idx + 1} / ${S.words.length}`;
+  scoreTxt.textContent = `Pisteet: ${S.score}`;
+  progFill.style.width = `${(S.idx / S.words.length) * 100}%`;
+
+  // Direction hint
+  const { sourceLanguage:sl, targetLanguage:tl, sourceFlagEmoji:sf, targetFlagEmoji:tf } = LANG;
+  dirHint.textContent = S.reversed ? `${tf} ${tl} → ${sl} ${sf}` : `${sf} ${sl} → ${tl} ${tf}`;
+
+  // Question word
+  wordTxt.textContent = question(w);
+
+  // Reset feedback & buttons
+  fb.className = 'fb';
+  fb.innerHTML = '';
+  btnNext.classList.remove('visible');
+
+  if (S.mode === 'write') {
+    writeWrap.classList.remove('hidden');
+    choiceWrap.classList.add('hidden');
+    btnCheck.style.display = '';
+    answerInput.value    = '';
+    answerInput.disabled = false;
+    // slight delay so the screen transition finishes first
+    setTimeout(() => answerInput.focus(), 80);
+  } else {
+    writeWrap.classList.add('hidden');
+    choiceWrap.classList.remove('hidden');
+    btnCheck.style.display = 'none';
+    buildChoices(w);
+  }
+}
+
+/* ================================================================
+   WRITE MODE — CHECK
+================================================================ */
+function checkWrite() {
+  if (S.done) { advanceWord(); return; }
+  const w    = S.words[S.idx];
+  const user = norm(answerInput.value);
+  if (!user) return;
+
+  const full = norm(answer(w));
+  const core = norm(answerCore(w));
+  const art  = !S.reversed ? w.article : null;
+
+  let status;
+  if (user === full) {
+    status = 'perfect';
+  } else if (art && (user === core || user === norm(w.word))) {
+    status = 'partial';
+  } else {
+    status = 'wrong';
+  }
+
+  answerInput.disabled = true;
+  btnCheck.style.display = 'none';
+  S.done = true;
+
+  if (status === 'perfect') {
+    S.score++;
+    showFb('ok', `✅ <strong>Täysin oikein!</strong><br><em>${answer(w)}</em>`);
+  } else if (status === 'partial') {
+    S.score++;
+    showFb('warn', `⚠️ <strong>Oikein – muista artikkeli!</strong><br>Oikea muoto: <em>${answer(w)}</em>`);
+  } else {
+    S.wrong.push(w);
+    showFb('err', `❌ <strong>Väärin.</strong> Oikea vastaus: <em>${answer(w)}</em>`);
+  }
+
+  scoreTxt.textContent = `Pisteet: ${S.score}`;
+  btnNext.classList.add('visible');
+  btnNext.focus();
+}
+
+/* ================================================================
+   MULTIPLE CHOICE — BUILD & HANDLE
+================================================================ */
+function buildChoices(correct) {
+  // 3 distractors from whole VOCAB pool (not just current game words) for variety
+  const pool = VOCAB.filter(w => answer(w) !== answer(correct));
+  const opts = shuffle([correct, ...shuffle(pool).slice(0, 3)]);
+
+  choicesGrid.innerHTML = '';
+  opts.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className   = 'choice';
+    btn.textContent = answer(opt);
+    btn.addEventListener('click', () => pickChoice(btn, opt, correct));
+    choicesGrid.appendChild(btn);
+  });
+}
+
+function pickChoice(clicked, chosen, correct) {
+  if (S.done) return;
+  S.done = true;
+
+  const isOk = answer(chosen) === answer(correct);
+
+  choicesGrid.querySelectorAll('.choice').forEach(b => {
+    b.disabled = true;
+    if (norm(b.textContent) === norm(answer(correct))) {
+      b.classList.add('correct');
+    } else if (b === clicked && !isOk) {
+      b.classList.add('wrong');
+    } else {
+      b.classList.add('dim');
+    }
+  });
+
+  if (isOk) {
+    S.score++;
+    showFb('ok', `✅ Oikein! <em>${answer(correct)}</em>`);
+  } else {
+    S.wrong.push(correct);
+    showFb('err', `❌ Väärin! Oikea: <em>${answer(correct)}</em>`);
+  }
+
+  scoreTxt.textContent = `Pisteet: ${S.score}`;
+  btnNext.classList.add('visible');
+  btnNext.focus();
+}
+
+/* ================================================================
+   SHARED HELPERS
+================================================================ */
+function showFb(type, html) {
+  fb.className = `fb show ${type}`;
+  fb.innerHTML = html;
+}
+
+function advanceWord() {
+  S.idx++;
+  if (S.idx >= S.words.length) showResults();
+  else renderWord();
+}
+
+/* ================================================================
+   RESULTS
+================================================================ */
+function showResults() {
+  showScreen('results');
+  const total = S.words.length;
+  const pct   = Math.round((S.score / total) * 100);
+  progFill.style.width = '100%';
+
+  resScore.textContent = `${S.score} / ${total}`;
+  resPct.textContent   = `${pct}%`;
+
+  if      (pct === 100) { resEmoji.textContent = '🏆'; resMsg.textContent = 'Täydellinen suoritus!'; }
+  else if (pct >= 80)   { resEmoji.textContent = '💪'; resMsg.textContent = 'Erinomaista työtä!'; }
+  else if (pct >= 50)   { resEmoji.textContent = '👍'; resMsg.textContent = 'Hyvä alku, jatka harjoittelua!'; }
+  else                  { resEmoji.textContent = '📚'; resMsg.textContent = 'Harjoitus tekee mestarin!'; }
+
+  if (S.wrong.length > 0) {
+    btnWrong.classList.remove('hidden');
+    btnWrong.textContent = `Harjoittele väärät uudelleen (${S.wrong.length}) 🔁`;
+  } else {
+    btnWrong.classList.add('hidden');
+  }
+}
+
+/* ================================================================
+   EVENT LISTENERS
+================================================================ */
+el('btnGo').addEventListener('click',      () => startGame());
+btnCheck.addEventListener('click',         checkWrite);
+btnNext.addEventListener('click',          advanceWord);
+btnRestart.addEventListener('click',       () => startGame());
+btnWrong.addEventListener('click',         () => startGame([...S.wrong]));
+btnQuit.addEventListener('click',          () => { closeSettings(); showScreen('start'); updateStartUI(); });
+
+answerInput.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  if (!S.done) checkWrite();
+  else advanceWord();
+});
+
+/* ================================================================
+   INIT
+================================================================ */
+updateDirUI();
+updateStartUI();
+</script>
+</body>
+</html>
