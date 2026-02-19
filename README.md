@@ -42,7 +42,7 @@ Jokainen sana on oma rivinsä, muodossa:
 | `source` | Lähdekielen sana tai lause, esim. `pöytä` |
 | `target` | Kohdekielen sana artikkelin kanssa, esim. `der Tisch` |
 | `article` | Pelkkä artikkeli (`der`, `die`, `das`) tai `null` jos ei ole |
-| `word` | Kohdekielen sana ilman artikkelia |
+| `word` | Kohdekielen sana ilman artikkelia, esim. `Tisch` |
 
 **Esimerkki uuden sanan lisäämisestä:**
 ```js
