@@ -13,39 +13,34 @@
 <meta name="theme-color" content="#0f0a2e">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+/* ═══════════════════════════════════════════
+   RESET & ROOT
+═══════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
   --font: 'Outfit', sans-serif;
-  --radius-xl: 28px;
-  --radius-lg: 18px;
-  --radius-md: 12px;
-  --glass-bg: rgba(255,255,255,0.08);
-  --glass-bg-hover: rgba(255,255,255,0.14);
-  --glass-border: rgba(255,255,255,0.15);
-  --glass-blur: blur(24px) saturate(180%);
-  --text-primary: rgba(255,255,255,0.95);
-  --text-secondary: rgba(255,255,255,0.60);
-  --accent-pink: #ff6ec7;
-  --accent-blue: #6eb8ff;
+  --rx: 28px; --rl: 18px; --rm: 12px;
+  --glass: rgba(255,255,255,0.08);
+  --glass-h: rgba(255,255,255,0.14);
+  --border: rgba(255,255,255,0.15);
+  --blur: blur(24px) saturate(180%);
+  --tp: rgba(255,255,255,0.95);
+  --ts: rgba(255,255,255,0.60);
+  --pink: #ff6ec7; --blue: #6eb8ff; --purple: #b06eff;
+  --green: #4ade80; --yellow: #fbbf24; --red: #f87171;
 }
-
 html { height: 100%; }
 body {
-  font-family: var(--font);
-  color: var(--text-primary);
-  overflow-x: hidden;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 16px 16px 120px;
+  font-family: var(--font); color: var(--tp); overflow-x: hidden;
+  min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+  padding: 16px 16px 116px;
   background: linear-gradient(135deg,#1a1a2e,#16213e,#0f3460,#533483);
-  background-attachment: fixed;
-  transition: background 0.9s ease;
+  background-attachment: fixed; transition: background 0.9s ease;
 }
 
-/* ── Background orbs ── */
+/* ═══════════════════════════════════════════
+   BACKGROUND ORBS
+═══════════════════════════════════════════ */
 .bg-orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
 .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.22; animation: drift 20s ease-in-out infinite alternate; }
 .orb-1 { width: 520px; height: 520px; top: -140px; left: -120px; background: radial-gradient(circle,#a855f7,transparent 70%); }
@@ -53,142 +48,134 @@ body {
 .orb-3 { width: 320px; height: 320px; top: 42%; left: 52%; background: radial-gradient(circle,#60a5fa,transparent 70%); animation-duration: 23s; animation-delay: -5s; }
 @keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(45px,55px) scale(1.12); } }
 
-/* ── App wrapper ── */
+/* ═══════════════════════════════════════════
+   APP WRAPPER & GLASS
+═══════════════════════════════════════════ */
 .app { position: relative; z-index: 1; width: 100%; max-width: 560px; padding-top: 68px; }
-
-/* ── Glass base ── */
 .glass {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border-radius: var(--radius-xl);
+  background: var(--glass); border: 1px solid var(--border);
+  backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  border-radius: var(--rx);
   box-shadow: 0 8px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.14);
 }
 
-/* ── Settings button (top-left) ── */
+/* ═══════════════════════════════════════════
+   SETTINGS BUTTON
+═══════════════════════════════════════════ */
 #settingsBtn {
-  position: fixed; top: 14px; left: 14px; z-index: 300;
+  position: fixed; top: 14px; left: 14px; z-index: 400;
   width: 46px; height: 46px; border-radius: 50%;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  background: var(--glass); border: 1px solid var(--border);
+  backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
   display: flex; align-items: center; justify-content: center;
   font-size: 21px; cursor: pointer;
   box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  transition: background 0.2s, transform 0.3s ease;
-  color: var(--text-primary);
+  transition: background 0.2s, transform 0.3s ease; color: var(--tp);
 }
-#settingsBtn:hover { background: var(--glass-bg-hover); transform: scale(1.08) rotate(25deg); }
+#settingsBtn:hover { background: var(--glass-h); transform: scale(1.08) rotate(25deg); }
 #settingsBtn.open  { transform: scale(1.08) rotate(60deg); }
 
-/* ── Settings panel ── */
+/* ═══════════════════════════════════════════
+   SETTINGS PANEL
+═══════════════════════════════════════════ */
 #settingsPanel {
-  position: fixed; top: 70px; left: 14px; z-index: 300;
-  width: 270px;
-  background: rgba(15,8,35,0.65);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(40px) saturate(220%);
-  -webkit-backdrop-filter: blur(40px) saturate(220%);
-  border-radius: var(--radius-lg);
-  padding: 18px 16px;
+  position: fixed; top: 70px; left: 14px; z-index: 400; width: 270px;
+  background: rgba(15,8,35,0.7); border: 1px solid var(--border);
+  backdrop-filter: blur(40px) saturate(220%); -webkit-backdrop-filter: blur(40px) saturate(220%);
+  border-radius: var(--rl); padding: 18px 16px;
   box-shadow: 0 16px 60px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.1);
-  transform-origin: top left;
-  transform: scale(0.82) translateY(-6px);
-  opacity: 0;
-  pointer-events: none;
+  transform-origin: top left; transform: scale(0.82) translateY(-6px);
+  opacity: 0; pointer-events: none;
   transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1), opacity 0.22s ease;
 }
 #settingsPanel.open { transform: scale(1) translateY(0); opacity: 1; pointer-events: all; }
-
 .set-label {
   font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em;
-  text-transform: uppercase; color: var(--text-secondary);
-  margin-bottom: 10px;
+  text-transform: uppercase; color: var(--ts); margin-bottom: 10px;
 }
-.set-label + .set-label, .set-section { margin-top: 16px; }
-
+.set-section { margin-top: 16px; }
 .swatches { display: flex; gap: 8px; flex-wrap: wrap; }
 .swatch {
   width: 38px; height: 38px; border-radius: 50%;
   border: 2.5px solid transparent; cursor: pointer;
   box-shadow: 0 2px 10px rgba(0,0,0,0.45);
-  transition: transform 0.2s, border-color 0.2s;
-  flex-shrink: 0;
+  transition: transform 0.2s, border-color 0.2s; flex-shrink: 0;
 }
 .swatch:hover { transform: scale(1.18); }
 .swatch.active { border-color: rgba(255,255,255,0.9); transform: scale(1.18); }
-
-/* Direction toggle row */
 .dir-row {
   display: flex; align-items: center; gap: 10px;
-  background: rgba(255,255,255,0.07);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
-  padding: 11px 12px; cursor: pointer;
-  transition: background 0.2s; user-select: none;
+  background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+  border-radius: var(--rm); padding: 11px 12px;
+  cursor: pointer; transition: background 0.2s; user-select: none;
 }
 .dir-row:hover { background: rgba(255,255,255,0.13); }
 .dir-row .dr-flags { font-size: 17px; white-space: nowrap; }
-.dir-row .dr-text { font-size: 13px; font-weight: 600; flex: 1; line-height: 1.2; }
+.dir-row .dr-text  { font-size: 13px; font-weight: 600; flex: 1; line-height: 1.2; }
 .dir-dot {
   width: 20px; height: 20px; border-radius: 50%;
-  border: 2px solid var(--accent-pink);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; color: var(--accent-pink);
+  border: 2px solid var(--pink); display: flex; align-items: center;
+  justify-content: center; font-size: 11px; color: var(--pink);
   transition: background 0.2s; flex-shrink: 0;
 }
-.dir-row.reversed .dir-dot { background: var(--accent-pink); color: #fff; }
+.dir-row.reversed .dir-dot { background: var(--pink); color: #fff; }
+.btn-quit {
+  width: 100%; margin-top: 14px; padding: 10px 14px;
+  border-radius: var(--rm); border: 1px solid rgba(248,113,113,0.35);
+  background: rgba(248,113,113,0.12); color: var(--red);
+  font-family: var(--font); font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: background 0.2s; display: none;
+}
+.btn-quit:hover { background: rgba(248,113,113,0.22); }
+.btn-quit.vis { display: block; }
 
-/* ── Bottom nav ── */
+/* ═══════════════════════════════════════════
+   BOTTOM NAV  (4 buttons)
+═══════════════════════════════════════════ */
 #bottomNav {
-  position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
-  z-index: 300;
+  position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 400;
   display: flex;
-  background: rgba(15,8,35,0.65);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(40px) saturate(220%);
-  -webkit-backdrop-filter: blur(40px) saturate(220%);
+  background: rgba(15,8,35,0.65); border: 1px solid var(--border);
+  backdrop-filter: blur(40px) saturate(220%); -webkit-backdrop-filter: blur(40px) saturate(220%);
   border-radius: 100px; padding: 5px;
   box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
 }
 .nb {
-  display: flex; flex-direction: column; align-items: center;
-  gap: 2px; padding: 9px 30px;
-  border-radius: 100px; border: none;
-  background: transparent; color: var(--text-secondary);
-  font-family: var(--font); font-size: 11px; font-weight: 600;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 8px 16px; border-radius: 100px; border: none;
+  background: transparent; color: var(--ts);
+  font-family: var(--font); font-size: 10.5px; font-weight: 600;
   cursor: pointer; transition: background 0.2s, color 0.2s;
   white-space: nowrap; user-select: none;
 }
-.nb .ni { font-size: 22px; line-height: 1; }
-.nb.active { background: rgba(255,255,255,0.15); color: var(--text-primary); box-shadow: inset 0 1px 0 rgba(255,255,255,0.15); }
+.nb .ni { font-size: 20px; line-height: 1; }
+.nb.active { background: rgba(255,255,255,0.15); color: var(--tp); box-shadow: inset 0 1px 0 rgba(255,255,255,0.15); }
 .nb:hover:not(.active) { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.8); }
 
-/* ── Overlay ── */
-#overlay { display: none; position: fixed; inset: 0; z-index: 200; }
+/* ═══════════════════════════════════════════
+   OVERLAY & SCREENS
+═══════════════════════════════════════════ */
+#overlay { display: none; position: fixed; inset: 0; z-index: 300; }
 #overlay.open { display: block; }
-
-/* ── Screens ── */
 .screen { display: none; }
 .screen.active { display: block; animation: fadeUp 0.32s ease; }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ===== START SCREEN ===== */
+/* ═══════════════════════════════════════════
+   START SCREEN
+═══════════════════════════════════════════ */
 .start-inner { padding: 52px 36px; text-align: center; }
 .start-h1 { font-size: clamp(24px,6vw,36px); font-weight: 800; line-height: 1.15; margin-bottom: 10px; }
-.start-h1 span { background: linear-gradient(130deg,#ff6ec7,#6eb8ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.start-h1 span { background: linear-gradient(130deg,var(--pink),var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 .lang-pill {
   display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);
-  border-radius: 100px; padding: 5px 16px; font-size: 14px; font-weight: 600;
-  margin-bottom: 22px;
+  background: rgba(255,255,255,0.1); border: 1px solid var(--border);
+  border-radius: 100px; padding: 5px 16px; font-size: 14px; font-weight: 600; margin-bottom: 22px;
 }
-.start-desc { color: var(--text-secondary); font-size: 15px; line-height: 1.6; margin-bottom: 34px; }
+.start-desc { color: var(--ts); font-size: 15px; line-height: 1.6; margin-bottom: 34px; }
 .btn-go {
   display: inline-flex; align-items: center; gap: 8px;
-  background: linear-gradient(135deg,#ff6ec7,#b06eff); color: #fff;
+  background: linear-gradient(135deg,var(--pink),var(--purple)); color: #fff;
   font-family: var(--font); font-weight: 700; font-size: 18px;
   padding: 16px 44px; border-radius: 100px; border: none; cursor: pointer;
   box-shadow: 0 4px 30px rgba(255,110,199,0.42);
@@ -197,148 +184,272 @@ body {
 .btn-go:hover  { transform: translateY(-2px) scale(1.03); box-shadow: 0 8px 40px rgba(255,110,199,0.55); }
 .btn-go:active { transform: scale(0.97); }
 
-/* ===== GAME SCREEN ===== */
-.game-inner { padding: 26px 26px 22px; }
-
-.prog-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary); font-weight: 600; margin-bottom: 5px; }
-.prog-track { height: 5px; background: rgba(255,255,255,0.12); border-radius: 100px; margin-bottom: 22px; overflow: hidden; }
-.prog-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg,#6eb8ff,#b06eff,#ff6ec7); transition: width 0.55s cubic-bezier(.4,0,.2,1); }
-
-.dir-hint { text-align: center; font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 10px; }
-
+/* ═══════════════════════════════════════════
+   SHARED GAME ELEMENTS
+═══════════════════════════════════════════ */
+.prog-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--ts); font-weight: 600; margin-bottom: 5px; }
+.prog-track { height: 5px; background: rgba(255,255,255,0.12); border-radius: 100px; margin-bottom: 20px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg,var(--blue),var(--purple),var(--pink)); transition: width 0.55s cubic-bezier(.4,0,.2,1); }
+.dir-hint { text-align: center; font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ts); margin-bottom: 10px; }
 .word-card {
-  background: rgba(255,255,255,0.10);
-  border: 1px solid rgba(255,255,255,0.18);
-  border-radius: var(--radius-lg);
-  padding: 30px 20px; text-align: center; margin-bottom: 20px;
+  background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.18);
+  border-radius: var(--rl); padding: 28px 20px; text-align: center; margin-bottom: 18px;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
 }
-.word-text { font-size: clamp(19px,5vw,29px); font-weight: 700; line-height: 1.35; }
-
-/* Write mode */
-#answerInput {
-  width: 100%;
-  background: rgba(255,255,255,0.09);
-  border: 1.5px solid rgba(255,255,255,0.2);
-  border-radius: var(--radius-md);
-  padding: 14px 18px;
-  font-family: var(--font); font-size: 17px; font-weight: 500;
-  color: var(--text-primary); outline: none;
-  transition: border-color 0.2s, background 0.2s;
-  margin-bottom: 12px;
-}
-#answerInput::placeholder { color: rgba(255,255,255,0.32); }
-#answerInput:focus { border-color: rgba(255,110,199,0.65); background: rgba(255,255,255,0.13); }
-#answerInput:disabled { opacity: 0.65; }
-
-/* Multiple choice */
-.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-.choice {
-  background: rgba(255,255,255,0.08);
-  border: 1.5px solid rgba(255,255,255,0.14);
-  border-radius: var(--radius-md);
-  padding: 14px 10px;
-  font-family: var(--font); font-size: 14.5px; font-weight: 600;
-  color: var(--text-primary); cursor: pointer; text-align: center;
-  line-height: 1.3; min-height: 58px;
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s, border-color 0.15s, transform 0.12s;
-}
-.choice:hover:not(:disabled) { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.3); transform: scale(1.03); }
-.choice:active:not(:disabled) { transform: scale(0.97); }
-.choice:disabled { cursor: default; }
-.choice.correct { background: rgba(74,222,128,0.18); border-color: #4ade80; color: #4ade80; }
-.choice.wrong   { background: rgba(248,113,113,0.18); border-color: #f87171; color: #f87171; }
-.choice.dim     { opacity: 0.42; }
-
-/* Feedback */
+.word-text { font-size: clamp(18px,5vw,28px); font-weight: 700; line-height: 1.35; }
 .fb {
-  border-radius: var(--radius-md); padding: 13px 16px;
-  text-align: center; font-weight: 600; font-size: 14.5px; margin-bottom: 12px;
-  line-height: 1.4; display: none;
+  border-radius: var(--rm); padding: 13px 16px; text-align: center;
+  font-weight: 600; font-size: 14.5px; margin-bottom: 12px; line-height: 1.4; display: none;
 }
 .fb.show { display: block; animation: pop 0.22s cubic-bezier(0.34,1.56,0.64,1); }
 @keyframes pop { from { transform: scale(0.88); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.fb.ok   { background: rgba(74,222,128,0.14); border: 1px solid rgba(74,222,128,0.4); color: #4ade80; }
-.fb.warn { background: rgba(251,191,36,0.14); border: 1px solid rgba(251,191,36,0.4); color: #fbbf24; }
-.fb.err  { background: rgba(248,113,113,0.14); border: 1px solid rgba(248,113,113,0.4); color: #f87171; }
-
-/* Action buttons */
+.fb.ok   { background: rgba(74,222,128,0.14); border: 1px solid rgba(74,222,128,0.4); color: var(--green); }
+.fb.warn { background: rgba(251,191,36,0.14); border: 1px solid rgba(251,191,36,0.4); color: var(--yellow); }
+.fb.err  { background: rgba(248,113,113,0.14); border: 1px solid rgba(248,113,113,0.4); color: var(--red); }
 .btn-check {
-  width: 100%; padding: 14px; border: none; border-radius: var(--radius-md);
+  width: 100%; padding: 14px; border: none; border-radius: var(--rm);
   font-family: var(--font); font-size: 16px; font-weight: 700; cursor: pointer;
-  background: linear-gradient(135deg,#ff6ec7,#b06eff); color: #fff;
+  background: linear-gradient(135deg,var(--pink),var(--purple)); color: #fff;
   box-shadow: 0 4px 20px rgba(255,110,199,0.3);
   transition: transform 0.14s, box-shadow 0.14s;
 }
 .btn-check:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(255,110,199,0.48); }
 .btn-check:active { transform: scale(0.98); }
 .btn-next {
-  width: 100%; padding: 14px; border-radius: var(--radius-md); cursor: pointer;
+  width: 100%; padding: 14px; border-radius: var(--rm); cursor: pointer;
   font-family: var(--font); font-size: 16px; font-weight: 700;
   background: rgba(110,184,255,0.16); border: 1px solid rgba(110,184,255,0.32);
-  color: var(--accent-blue);
-  transition: background 0.15s;
-  display: none;
+  color: var(--blue); transition: background 0.15s; display: none;
 }
 .btn-next:hover { background: rgba(110,184,255,0.26); }
-.btn-next.visible { display: block; }
+.btn-next.vis { display: block; }
 
-/* ===== RESULTS SCREEN ===== */
+/* ═══════════════════════════════════════════
+   WRITE MODE
+═══════════════════════════════════════════ */
+.game-inner { padding: 26px 26px 22px; }
+#answerInput {
+  width: 100%; background: rgba(255,255,255,0.09);
+  border: 1.5px solid rgba(255,255,255,0.2); border-radius: var(--rm);
+  padding: 14px 18px; font-family: var(--font); font-size: 17px; font-weight: 500;
+  color: var(--tp); outline: none; transition: border-color 0.2s, background 0.2s; margin-bottom: 12px;
+}
+#answerInput::placeholder { color: rgba(255,255,255,0.32); }
+#answerInput:focus { border-color: rgba(255,110,199,0.65); background: rgba(255,255,255,0.13); }
+#answerInput:disabled { opacity: 0.65; }
+
+/* ═══════════════════════════════════════════
+   MULTIPLE CHOICE
+═══════════════════════════════════════════ */
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.choice {
+  background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.14);
+  border-radius: var(--rm); padding: 14px 10px;
+  font-family: var(--font); font-size: 14.5px; font-weight: 600;
+  color: var(--tp); cursor: pointer; text-align: center; line-height: 1.3;
+  min-height: 58px; display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, border-color 0.15s, transform 0.12s;
+}
+.choice:hover:not(:disabled) { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.3); transform: scale(1.03); }
+.choice:active:not(:disabled) { transform: scale(0.97); }
+.choice:disabled { cursor: default; }
+.choice.correct { background: rgba(74,222,128,0.18); border-color: var(--green); color: var(--green); }
+.choice.wrong   { background: rgba(248,113,113,0.18); border-color: var(--red);   color: var(--red); }
+.choice.dim     { opacity: 0.38; }
+
+/* ═══════════════════════════════════════════
+   FLASHCARD MODE
+═══════════════════════════════════════════ */
+.flash-inner { padding: 26px 26px 22px; }
+
+.card-scene {
+  perspective: 900px; width: 100%; margin-bottom: 14px; cursor: pointer;
+}
+.card-3d {
+  width: 100%; height: 190px; position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.4,0,0.2,1);
+}
+.card-3d.flipped { transform: rotateY(180deg); }
+.card-face {
+  position: absolute; inset: 0; backface-visibility: hidden;
+  -webkit-backface-visibility: hidden; border-radius: var(--rl);
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 24px 20px; text-align: center;
+  user-select: none;
+}
+.card-front {
+  background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.20);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.card-back {
+  transform: rotateY(180deg);
+  background: rgba(110,184,255,0.10); border: 1px solid rgba(110,184,255,0.30);
+  box-shadow: inset 0 1px 0 rgba(110,184,255,0.15);
+}
+.card-side-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ts); margin-bottom: 10px;
+}
+.card-word { font-size: clamp(18px,5vw,28px); font-weight: 700; line-height: 1.35; }
+.card-tap-hint {
+  font-size: 12px; color: var(--ts); text-align: center; margin-bottom: 14px;
+  min-height: 18px; transition: opacity 0.3s;
+}
+.card-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; display: none; }
+.card-actions.vis { display: grid; }
+.btn-card-wrong {
+  padding: 14px; border-radius: var(--rm);
+  border: 1px solid rgba(248,113,113,0.4); background: rgba(248,113,113,0.12);
+  color: var(--red); font-family: var(--font); font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: background 0.15s, transform 0.12s;
+}
+.btn-card-wrong:hover { background: rgba(248,113,113,0.22); transform: scale(1.02); }
+.btn-card-right {
+  padding: 14px; border-radius: var(--rm);
+  border: 1px solid rgba(74,222,128,0.4); background: rgba(74,222,128,0.12);
+  color: var(--green); font-family: var(--font); font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: background 0.15s, transform 0.12s;
+}
+.btn-card-right:hover { background: rgba(74,222,128,0.22); transform: scale(1.02); }
+.card-key-hints {
+  display: none; justify-content: center; gap: 18px;
+  font-size: 12px; color: var(--ts); text-align: center; margin-bottom: 0;
+}
+.card-key-hints.vis { display: flex; }
+.key-hint { display: flex; align-items: center; gap: 5px; }
+.key-badge {
+  background: rgba(255,255,255,0.12); border: 1px solid var(--border);
+  border-radius: 5px; padding: 2px 6px; font-size: 11px; font-weight: 700;
+}
+
+/* ═══════════════════════════════════════════
+   WORD BUILDER MODE
+═══════════════════════════════════════════ */
+.build-inner { padding: 26px 26px 22px; }
+.build-question { margin-bottom: 16px; }
+
+.build-answer-wrap {
+  display: flex; align-items: flex-start; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;
+}
+.build-article {
+  background: rgba(176,110,255,0.18); border: 1px solid rgba(176,110,255,0.4);
+  color: var(--purple); border-radius: 10px; padding: 8px 12px;
+  font-size: 16px; font-weight: 700; white-space: nowrap; flex-shrink: 0;
+  align-self: center;
+}
+.build-slots { display: flex; flex-wrap: wrap; gap: 5px; flex: 1; }
+.build-slot {
+  width: 36px; height: 44px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; font-weight: 700; transition: background 0.15s, transform 0.12s;
+}
+.build-slot.empty {
+  background: rgba(255,255,255,0.06); border: 1.5px dashed rgba(255,255,255,0.2);
+}
+.build-slot.filled {
+  background: rgba(110,184,255,0.15); border: 1.5px solid rgba(110,184,255,0.4);
+  color: var(--blue); cursor: pointer;
+}
+.build-slot.filled:hover { background: rgba(248,113,113,0.15); border-color: rgba(248,113,113,0.5); color: var(--red); }
+.build-slot.correct-slot { background: rgba(74,222,128,0.18); border-color: var(--green); color: var(--green); }
+.build-slot.wrong-slot   { background: rgba(248,113,113,0.18); border-color: var(--red);   color: var(--red); }
+
+.build-tiles-wrap {
+  display: flex; flex-wrap: wrap; gap: 7px; padding: 12px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--rm); margin-bottom: 14px; min-height: 68px;
+}
+.build-tile {
+  width: 36px; height: 44px; border-radius: 9px;
+  background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; font-weight: 700; cursor: pointer; user-select: none;
+  transition: background 0.15s, transform 0.12s, opacity 0.2s;
+}
+.build-tile:hover { background: rgba(255,255,255,0.22); transform: translateY(-3px); }
+.build-tile:active { transform: scale(0.93); }
+.build-tile.used { opacity: 0.18; pointer-events: none; }
+
+.build-controls { display: flex; gap: 8px; margin-bottom: 12px; }
+.btn-build-clear {
+  flex: 0 0 auto; padding: 10px 16px; border-radius: var(--rm);
+  border: 1px solid var(--border); background: rgba(255,255,255,0.07);
+  color: var(--ts); font-family: var(--font); font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: background 0.15s;
+}
+.btn-build-clear:hover { background: rgba(255,255,255,0.13); }
+.build-len-hint { font-size: 12px; color: var(--ts); align-self: center; }
+
+/* Skip-word (for non-buildable in build mode) */
+.skip-notice {
+  background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3);
+  border-radius: var(--rm); padding: 10px 14px; color: var(--yellow);
+  font-size: 13px; font-weight: 600; text-align: center; margin-bottom: 12px;
+}
+
+/* ═══════════════════════════════════════════
+   RESULTS SCREEN
+═══════════════════════════════════════════ */
 .results-inner { padding: 52px 32px; text-align: center; }
 .res-emoji { font-size: 70px; margin-bottom: 14px; display: block; animation: bounceIn 0.5s cubic-bezier(0.34,1.56,0.64,1); }
 @keyframes bounceIn { from { transform: scale(0.25); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .res-title { font-size: 27px; font-weight: 800; margin-bottom: 18px; }
-.res-score { font-size: 56px; font-weight: 800; background: linear-gradient(135deg,#4ade80,#6eb8ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.res-pct  { font-size: 21px; color: var(--text-secondary); margin-bottom: 6px; }
-.res-msg  { font-size: 16px; color: var(--text-secondary); margin-bottom: 30px; }
+.res-score { font-size: 56px; font-weight: 800; background: linear-gradient(135deg,var(--green),var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.res-pct  { font-size: 21px; color: var(--ts); margin-bottom: 6px; }
+.res-msg  { font-size: 16px; color: var(--ts); margin-bottom: 30px; }
 .res-btns { display: flex; flex-direction: column; gap: 10px; }
 .btn-res {
   padding: 13px 24px; border-radius: 100px;
   font-family: var(--font); font-size: 15px; font-weight: 700;
   cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; border: none;
 }
-.btn-res.prim { background: linear-gradient(135deg,#ff6ec7,#b06eff); color: #fff; box-shadow: 0 4px 20px rgba(255,110,199,0.3); }
+.btn-res.prim { background: linear-gradient(135deg,var(--pink),var(--purple)); color: #fff; box-shadow: 0 4px 20px rgba(255,110,199,0.3); }
 .btn-res.prim:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(255,110,199,0.48); }
-.btn-res.sec { background: rgba(255,255,255,0.09); border: 1px solid var(--glass-border); color: var(--text-primary); }
+.btn-res.sec { background: rgba(255,255,255,0.09); border: 1px solid var(--border); color: var(--tp); }
 .btn-res.sec:hover { background: rgba(255,255,255,0.15); }
 
-/* ── Quit game button (only visible during game) ── */
-.btn-quit {
-  width: 100%; margin-top: 14px; padding: 10px 14px;
-  border-radius: var(--radius-md); border: 1px solid rgba(248,113,113,0.35);
-  background: rgba(248,113,113,0.12); color: #f87171;
-  font-family: var(--font); font-size: 13px; font-weight: 700;
-  cursor: pointer; transition: background 0.2s;
-  display: none;
+/* ═══════════════════════════════════════════
+   iOS HINT
+═══════════════════════════════════════════ */
+#iosHint {
+  display: none; position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+  background: rgba(15,10,46,0.92); backdrop-filter: blur(20px);
+  border: 1px solid var(--border); color: white; font-size: 13px;
+  padding: 12px 16px; border-radius: 14px; z-index: 500; width: 290px;
+  text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
-.btn-quit:hover { background: rgba(248,113,113,0.22); }
-.btn-quit.visible { display: block; }
+#iosHint button {
+  background: none; border: none; color: rgba(255,255,255,0.6);
+  font-size: 16px; cursor: pointer; margin-left: 8px; vertical-align: middle;
+}
 
-/* ── Utilities ── */
+/* ═══════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════ */
 .hidden { display: none !important; }
 
-/* ── Responsive ── */
-@media (max-width: 420px) {
-  body { padding: 12px 12px 120px; }
-  .game-inner { padding: 20px 16px 18px; }
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════ */
+@media (max-width: 440px) {
+  body { padding: 12px 12px 114px; }
+  .game-inner, .flash-inner, .build-inner { padding: 20px 16px 18px; }
   .choices { grid-template-columns: 1fr; }
-  .nb { padding: 9px 22px; }
+  .nb { padding: 8px 10px; font-size: 9.5px; }
+  .nb .ni { font-size: 18px; }
+  .build-slot, .build-tile { width: 32px; height: 40px; font-size: 15px; }
 }
 </style>
 </head>
 <body>
 
 <div class="bg-orbs" aria-hidden="true">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
+  <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
 </div>
 
 <!-- Settings button -->
 <button id="settingsBtn" aria-label="Asetukset" aria-expanded="false">⚙️</button>
-
-<!-- Click-outside overlay -->
 <div id="overlay"></div>
 
 <!-- Settings panel -->
@@ -346,7 +457,6 @@ body {
   <div class="set-label">Taustaväri</div>
   <div class="swatches" id="swatchWrap"></div>
 
-  <!-- Hidden during active game -->
   <div id="dirSection">
     <div class="set-label set-section">Käännössuunta</div>
     <div class="dir-row" id="dirRow" role="button" tabindex="0" aria-label="Vaihda käännössuunta">
@@ -356,11 +466,10 @@ body {
     </div>
   </div>
 
-  <!-- Only visible during active game -->
   <button class="btn-quit" id="btnQuit">✕ Lopeta peli</button>
 </div>
 
-<!-- Main -->
+<!-- ═══ APP ═══ -->
 <main class="app">
 
   <!-- START -->
@@ -373,36 +482,87 @@ body {
     </div>
   </section>
 
-  <!-- GAME -->
+  <!-- WRITE / MULTIPLE CHOICE -->
   <section class="screen glass" id="gameScreen">
     <div class="game-inner">
-      <div class="prog-row">
-        <span id="progTxt"></span>
-        <span id="scoreTxt"></span>
-      </div>
+      <div class="prog-row"><span id="progTxt"></span><span id="scoreTxt"></span></div>
       <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
-
       <div class="dir-hint" id="dirHint"></div>
-
-      <div class="word-card">
-        <div class="word-text" id="wordTxt"></div>
-      </div>
-
-      <!-- Write -->
+      <div class="word-card"><div class="word-text" id="wordTxt"></div></div>
       <div id="writeWrap">
         <input id="answerInput" type="text" autocomplete="off" autocorrect="off"
                autocapitalize="off" spellcheck="false" placeholder="Kirjoita vastaus…">
       </div>
-
-      <!-- Choice -->
       <div id="choiceWrap" class="hidden">
         <div class="choices" id="choicesGrid"></div>
       </div>
-
       <div class="fb" id="fb"></div>
-
       <button class="btn-check" id="btnCheck">Tarkista ✓</button>
       <button class="btn-next"  id="btnNext">Seuraava ➡</button>
+    </div>
+  </section>
+
+  <!-- FLASHCARD -->
+  <section class="screen glass" id="flashScreen">
+    <div class="flash-inner">
+      <div class="prog-row"><span id="fProgTxt"></span><span id="fScoreTxt"></span></div>
+      <div class="prog-track"><div class="prog-fill" id="fProgFill" style="width:0%"></div></div>
+      <div class="dir-hint" id="fDirHint"></div>
+
+      <div class="card-scene" id="cardScene" role="button" tabindex="0" aria-label="Käännä kortti">
+        <div class="card-3d" id="card3d">
+          <div class="card-face card-front">
+            <div class="card-side-label" id="cardFrontLabel"></div>
+            <div class="card-word" id="cardFront"></div>
+          </div>
+          <div class="card-face card-back">
+            <div class="card-side-label" id="cardBackLabel"></div>
+            <div class="card-word" id="cardBack"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-tap-hint" id="cardTapHint">Napauta korttia kääntääksesi ↕</div>
+
+      <div class="card-actions" id="cardActions">
+        <button class="btn-card-wrong" id="btnCardWrong">✗ &nbsp;Väärin</button>
+        <button class="btn-card-right" id="btnCardRight">✓ &nbsp;Oikein</button>
+      </div>
+
+      <div class="card-key-hints" id="cardKeyHints">
+        <span class="key-hint"><span class="key-badge">←</span> Väärin</span>
+        <span class="key-hint"><span class="key-badge">↑↓</span> Käännä</span>
+        <span class="key-hint"><span class="key-badge">→</span> Oikein</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORD BUILDER -->
+  <section class="screen glass" id="buildScreen">
+    <div class="build-inner">
+      <div class="prog-row"><span id="bProgTxt"></span><span id="bScoreTxt"></span></div>
+      <div class="prog-track"><div class="prog-fill" id="bProgFill" style="width:0%"></div></div>
+      <div class="dir-hint" id="bDirHint"></div>
+
+      <div class="word-card build-question">
+        <div class="word-text" id="buildQuestion"></div>
+      </div>
+
+      <div class="build-answer-wrap">
+        <span class="build-article" id="buildArticle" style="display:none"></span>
+        <div class="build-slots" id="buildSlots"></div>
+      </div>
+
+      <div class="build-tiles-wrap" id="buildTiles"></div>
+
+      <div class="build-controls">
+        <button class="btn-build-clear" id="btnBuildClear">⌫ Tyhjennä</button>
+        <span class="build-len-hint" id="buildLenHint"></span>
+      </div>
+
+      <div class="fb" id="bFb"></div>
+      <button class="btn-check" id="btnBuildCheck">Tarkista ✓</button>
+      <button class="btn-next"  id="btnBuildNext">Seuraava ➡</button>
     </div>
   </section>
 
@@ -423,37 +583,29 @@ body {
 
 </main>
 
-<!-- Bottom nav -->
+<!-- Bottom nav — 4 modes -->
 <nav id="bottomNav" aria-label="Pelimuoto">
-  <button class="nb" data-mode="multiple" id="nbMultiple">
-    <span class="ni">🎯</span>Monivalinta
-  </button>
-  <button class="nb active" data-mode="write" id="nbWrite">
-    <span class="ni">✏️</span>Kirjoitus
-  </button>
+  <button class="nb" data-mode="flash"    id="nbFlash">   <span class="ni">🃏</span>Kortit    </button>
+  <button class="nb" data-mode="build"    id="nbBuild">   <span class="ni">🔡</span>Rakenna   </button>
+  <button class="nb" data-mode="multiple" id="nbMultiple"><span class="ni">🎯</span>Monivalinta</button>
+  <button class="nb active" data-mode="write" id="nbWrite"><span class="ni">✏️</span>Kirjoitus</button>
 </nav>
 
+<!-- iOS hint -->
+<div id="iosHint">
+  Lisää kotinäytölle: paina <strong>⎋ Jaa</strong> → <strong>Lisää Koti-valikkoon</strong>
+  <button onclick="this.parentElement.style.display='none'">✕</button>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     VOCABULARY — muokkaa tätä osioita
+═══════════════════════════════════════════ -->
 <script>
-/* ================================================================
-   VOCABULARY  –  muokkaa tätä osiota lisätäksesi sanoja
-   ================================================================
-   LANGUAGE_CONFIG:
-     sourceLanguage / targetLanguage  = kielen nimi tekstissä
-     sourceFlagEmoji / targetFlagEmoji = lippu-emoji
-================================================================ */
 const LANG = {
-  sourceLanguage:   'Suomi',
-  targetLanguage:   'Saksa',
-  sourceFlagEmoji:  '🇫🇮',
-  targetFlagEmoji:  '🇩🇪',
+  sourceLanguage:  'Suomi',   targetLanguage:  'Saksa',
+  sourceFlagEmoji: '🇫🇮',    targetFlagEmoji: '🇩🇪',
 };
 
-/* Jokainen sana-objekti:
-   source  = lähdekielen ilmaisu
-   target  = kohdekielen ilmaisu (artikkeli mukana, esim. "der Gewinn")
-   article = pelkkä artikkeli tai null
-   word    = kohdekielen sana ilman artikkelia
-*/
 const VOCAB = [
   { source:"Palkinto kahdelle",                         target:"Gewinn für zwei",                             article:null,  word:"Gewinn für zwei" },
   { source:"voitto, palkinto",                          target:"der Gewinn",                                  article:"der", word:"Gewinn" },
@@ -529,428 +681,539 @@ const VOCAB = [
   { source:"Nähdään pian!",                             target:"Bis bald!",                                   article:null,  word:"Bis bald!" },
 ];
 
-/* ================================================================
+/* ═══════════════════════════════════════════
    GRADIENT THEMES
-================================================================ */
+═══════════════════════════════════════════ */
 const GRADS = [
-  { name:"Kosminen",    bg:"linear-gradient(135deg,#1a1a2e,#16213e,#0f3460,#533483)", sw:"linear-gradient(135deg,#533483,#0f3460)" },
-  { name:"Merivirta",   bg:"linear-gradient(135deg,#0d2137,#0a4a6e,#0a7a6b)",         sw:"linear-gradient(135deg,#0a7a6b,#0a4a6e)" },
-  { name:"Auringonlasku",bg:"linear-gradient(135deg,#2d0a1e,#7b1a4b,#c0392b)",        sw:"linear-gradient(135deg,#c0392b,#7b1a4b)" },
-  { name:"Metsä",       bg:"linear-gradient(135deg,#0d1b2a,#1b4332,#2d6a4f)",         sw:"linear-gradient(135deg,#2d6a4f,#1b4332)" },
-  { name:"Kristalli",   bg:"linear-gradient(135deg,#1a0533,#4a0080,#9b00d3)",          sw:"linear-gradient(135deg,#9b00d3,#4a0080)" },
+  { name:"Kosminen",     bg:"linear-gradient(135deg,#1a1a2e,#16213e,#0f3460,#533483)", sw:"linear-gradient(135deg,#533483,#0f3460)" },
+  { name:"Merivirta",    bg:"linear-gradient(135deg,#0d2137,#0a4a6e,#0a7a6b)",         sw:"linear-gradient(135deg,#0a7a6b,#0a4a6e)" },
+  { name:"Auringonlasku",bg:"linear-gradient(135deg,#2d0a1e,#7b1a4b,#c0392b)",         sw:"linear-gradient(135deg,#c0392b,#7b1a4b)" },
+  { name:"Metsä",        bg:"linear-gradient(135deg,#0d1b2a,#1b4332,#2d6a4f)",         sw:"linear-gradient(135deg,#2d6a4f,#1b4332)" },
+  { name:"Kristalli",    bg:"linear-gradient(135deg,#1a0533,#4a0080,#9b00d3)",          sw:"linear-gradient(135deg,#9b00d3,#4a0080)" },
 ];
 
-/* ================================================================
+/* ═══════════════════════════════════════════
    STATE
-================================================================ */
+═══════════════════════════════════════════ */
 const S = {
-  mode:     'write',   // 'write' | 'multiple'
+  mode: 'write',      // 'write' | 'multiple' | 'flash' | 'build'
   reversed: false,
-  gradIdx:  0,
-  words:    [],
-  wrong:    [],
-  idx:      0,
-  score:    0,
-  done:     false,     // current question answered?
+  gradIdx: 0,
+  words: [],          // current game words (shuffled)
+  wrong: [],          // words answered incorrectly
+  idx: 0,             // current word index
+  score: 0,
+  done: false,        // current question answered?
+  // flash-specific
+  flipped: false,
+  // build-specific
+  buildTarget: '',    // word to build (original case, no article)
+  buildTiles: [],     // [{char, id, used}]
+  buildPlaced: [],    // tile ids in placement order
 };
 
-/* ================================================================
+/* ═══════════════════════════════════════════
    DOM
-================================================================ */
+═══════════════════════════════════════════ */
 const el = id => document.getElementById(id);
 
-const settingsBtn  = el('settingsBtn');
-const settingsPanel= el('settingsPanel');
-const overlay      = el('overlay');
-const swatchWrap   = el('swatchWrap');
-const dirRow       = el('dirRow');
-const drFlags      = el('drFlags');
-const drText       = el('drText');
-const dirDot       = el('dirDot');
-
-const startScreen  = el('startScreen');
-const gameScreen   = el('gameScreen');
-const resultsScreen= el('resultsScreen');
-const startH1      = el('startH1');
-const langPill     = el('langPill');
-const startDesc    = el('startDesc');
-
-const progTxt      = el('progTxt');
-const scoreTxt     = el('scoreTxt');
-const progFill     = el('progFill');
-const dirHint      = el('dirHint');
-const wordTxt      = el('wordTxt');
-const writeWrap    = el('writeWrap');
-const choiceWrap   = el('choiceWrap');
-const answerInput  = el('answerInput');
-const choicesGrid  = el('choicesGrid');
-const fb           = el('fb');
-const btnCheck     = el('btnCheck');
-const btnNext      = el('btnNext');
-
-const resEmoji     = el('resEmoji');
-const resScore     = el('resScore');
-const resPct       = el('resPct');
-const resMsg       = el('resMsg');
-const btnRestart   = el('btnRestart');
-const btnWrong     = el('btnWrong');
-const btnQuit      = el('btnQuit');
-
-const nbMultiple   = el('nbMultiple');
-const nbWrite      = el('nbWrite');
-
-/* ================================================================
+/* ═══════════════════════════════════════════
    HELPERS
-================================================================ */
+═══════════════════════════════════════════ */
 function shuffle(a) { return [...a].sort(() => Math.random() - 0.5); }
 function norm(s)    { return s ? s.toLowerCase().replace(/\s+/g,' ').trim() : ''; }
 
+function question(w) { return S.reversed ? w.target  : w.source; }
+function answer(w)   { return S.reversed ? w.source  : w.target; }
+function answerCore(w){ return S.reversed ? w.source  : w.word;  }
+function articleOf(w){ return S.reversed ? null : w.article; }
+
+function langHint() {
+  const { sourceLanguage:sl, targetLanguage:tl, sourceFlagEmoji:sf, targetFlagEmoji:tf } = LANG;
+  return S.reversed ? `${tf} ${tl} → ${sl} ${sf}` : `${sf} ${sl} → ${tl} ${tf}`;
+}
+
+/* isBuildable: only plain words (letters only, 3–18 chars) */
+function isBuildable(w) {
+  const word = S.reversed ? w.source : w.word;
+  return /^[\wäöüÄÖÜßàâéèêëîïôùûœæÅåøØ]+$/u.test(word) && word.length >= 3 && word.length <= 18;
+}
+
+/* ═══════════════════════════════════════════
+   SCREEN MANAGEMENT
+═══════════════════════════════════════════ */
 function showScreen(name) {
-  [startScreen, gameScreen, resultsScreen].forEach(s => s.classList.remove('active'));
-  ({ start: startScreen, game: gameScreen, results: resultsScreen })[name].classList.add('active');
+  ['startScreen','gameScreen','flashScreen','buildScreen','resultsScreen'].forEach(id => {
+    el(id).classList.remove('active');
+  });
+  el(name + 'Screen').classList.add('active');
 
-  const inGame = name === 'game';
-  // Bottom nav: visible only outside game
+  const inGame = ['game','flash','build'].includes(name);
   el('bottomNav').classList.toggle('hidden', inGame);
-  // Direction toggle: hidden during game
   el('dirSection').classList.toggle('hidden', inGame);
-  // Quit button: visible only during game
-  el('btnQuit').classList.toggle('visible', inGame);
+  el('btnQuit').classList.toggle('vis', inGame);
 }
 
-function question(w) { return S.reversed ? w.target : w.source; }
-function answer(w)   { return S.reversed ? w.source : w.target; }
-function answerCore(w) {
-  if (S.reversed) return w.source;
-  return w.word;
-}
-
-/* ================================================================
+/* ═══════════════════════════════════════════
    SETTINGS — GRADIENTS
-================================================================ */
+═══════════════════════════════════════════ */
 GRADS.forEach((g, i) => {
   const sw = document.createElement('div');
   sw.className = 'swatch' + (i === 0 ? ' active' : '');
-  sw.style.background = g.sw;
-  sw.title = g.name;
-  sw.setAttribute('role', 'button');
-  sw.setAttribute('tabindex', '0');
+  sw.style.background = g.sw; sw.title = g.name;
+  sw.setAttribute('role','button'); sw.setAttribute('tabindex','0');
   sw.addEventListener('click', () => setGrad(i));
-  sw.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') setGrad(i); });
-  swatchWrap.appendChild(sw);
+  sw.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' ') setGrad(i); });
+  el('swatchWrap').appendChild(sw);
 });
-
 function setGrad(i) {
   S.gradIdx = i;
   document.body.style.background = GRADS[i].bg;
   document.body.style.backgroundAttachment = 'fixed';
-  swatchWrap.querySelectorAll('.swatch').forEach((s, j) => s.classList.toggle('active', j === i));
+  el('swatchWrap').querySelectorAll('.swatch').forEach((s,j) => s.classList.toggle('active', j===i));
 }
 
-/* ================================================================
-   SETTINGS — PANEL OPEN / CLOSE
-================================================================ */
-function openSettings() {
-  settingsPanel.classList.add('open');
-  settingsBtn.classList.add('open');
-  settingsBtn.setAttribute('aria-expanded','true');
-  overlay.classList.add('open');
+/* ═══════════════════════════════════════════
+   SETTINGS — OPEN / CLOSE
+═══════════════════════════════════════════ */
+function openSettings()  {
+  el('settingsPanel').classList.add('open');
+  el('settingsBtn').classList.add('open');
+  el('settingsBtn').setAttribute('aria-expanded','true');
+  el('overlay').classList.add('open');
 }
 function closeSettings() {
-  settingsPanel.classList.remove('open');
-  settingsBtn.classList.remove('open');
-  settingsBtn.setAttribute('aria-expanded','false');
-  overlay.classList.remove('open');
+  el('settingsPanel').classList.remove('open');
+  el('settingsBtn').classList.remove('open');
+  el('settingsBtn').setAttribute('aria-expanded','false');
+  el('overlay').classList.remove('open');
 }
-
-settingsBtn.addEventListener('click', e => {
+el('settingsBtn').addEventListener('click', e => {
   e.stopPropagation();
-  settingsPanel.classList.contains('open') ? closeSettings() : openSettings();
+  el('settingsPanel').classList.contains('open') ? closeSettings() : openSettings();
 });
-overlay.addEventListener('click', closeSettings);
+el('overlay').addEventListener('click', closeSettings);
 
-/* ================================================================
-   SETTINGS — DIRECTION TOGGLE
-================================================================ */
+/* ═══════════════════════════════════════════
+   SETTINGS — DIRECTION
+═══════════════════════════════════════════ */
 function updateDirUI() {
   const { sourceLanguage:sl, targetLanguage:tl, sourceFlagEmoji:sf, targetFlagEmoji:tf } = LANG;
   if (S.reversed) {
-    drFlags.textContent = `${tf} → ${sf}`;
-    drText.textContent  = `${tl} → ${sl}`;
-    dirRow.classList.add('reversed');
+    el('drFlags').textContent = `${tf} → ${sf}`;
+    el('drText').textContent  = `${tl} → ${sl}`;
+    el('dirRow').classList.add('reversed');
   } else {
-    drFlags.textContent = `${sf} → ${tf}`;
-    drText.textContent  = `${sl} → ${tl}`;
-    dirRow.classList.remove('reversed');
+    el('drFlags').textContent = `${sf} → ${tf}`;
+    el('drText').textContent  = `${sl} → ${tl}`;
+    el('dirRow').classList.remove('reversed');
   }
 }
-
 function updateStartUI() {
   const { sourceLanguage:sl, targetLanguage:tl, sourceFlagEmoji:sf, targetFlagEmoji:tf } = LANG;
   if (S.reversed) {
-    startH1.textContent  = `${tl}–${sl} Sanastopeli`;
-    langPill.innerHTML   = `${tf} ${tl} &nbsp;→&nbsp; ${sl} ${sf}`;
+    el('startH1').textContent = `${tl}–${sl} Sanastopeli`;
+    el('langPill').innerHTML  = `${tf} ${tl} &nbsp;→&nbsp; ${sl} ${sf}`;
   } else {
-    startH1.textContent  = `${sl}–${tl} Sanastopeli`;
-    langPill.innerHTML   = `${sf} ${sl} &nbsp;→&nbsp; ${tl} ${tf}`;
+    el('startH1').textContent = `${sl}–${tl} Sanastopeli`;
+    el('langPill').innerHTML  = `${sf} ${sl} &nbsp;→&nbsp; ${tl} ${tf}`;
   }
-  const mode = S.mode === 'write' ? 'kirjoittamalla' : 'monivalinnalla';
-  const art  = !S.reversed ? '<br>Saat pisteen, vaikka artikkeli unohtuisi!' : '';
-  startDesc.innerHTML = `Harjoittele sanastoa ${mode}.${art}`;
+  const modeLabels = { write:'kirjoittamalla', multiple:'monivalinnalla', flash:'kääntökorteilla', build:'rakentamalla' };
+  const art = (S.mode !== 'build' && !S.reversed) ? '<br>Saat pisteen, vaikka artikkeli unohtuisi!' : '';
+  el('startDesc').innerHTML = `Harjoittele sanastoa ${modeLabels[S.mode]}.${art}`;
 }
+el('dirRow').addEventListener('click', () => { S.reversed = !S.reversed; updateDirUI(); updateStartUI(); });
+el('dirRow').addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' ') { e.preventDefault(); el('dirRow').click(); } });
 
-dirRow.addEventListener('click', () => {
-  S.reversed = !S.reversed;
-  updateDirUI();
-  updateStartUI();
-});
-dirRow.addEventListener('keydown', e => {
-  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dirRow.click(); }
-});
-
-/* ================================================================
+/* ═══════════════════════════════════════════
    BOTTOM NAV
-================================================================ */
-[nbMultiple, nbWrite].forEach(btn => {
-  btn.addEventListener('click', () => {
-    S.mode = btn.dataset.mode;
-    nbMultiple.classList.toggle('active', S.mode === 'multiple');
-    nbWrite.classList.toggle('active',    S.mode === 'write');
+═══════════════════════════════════════════ */
+['nbFlash','nbBuild','nbMultiple','nbWrite'].forEach(id => {
+  el(id).addEventListener('click', () => {
+    S.mode = el(id).dataset.mode;
+    ['nbFlash','nbBuild','nbMultiple','nbWrite'].forEach(x => el(x).classList.remove('active'));
+    el(id).classList.add('active');
     updateStartUI();
   });
 });
 
-/* ================================================================
+/* ═══════════════════════════════════════════
    GAME — START
-================================================================ */
+═══════════════════════════════════════════ */
 function startGame(wordsOverride) {
-  S.words = shuffle(wordsOverride || VOCAB);
-  S.wrong = [];
-  S.idx   = 0;
-  S.score = 0;
-  S.done  = false;
+  let pool = wordsOverride ? [...wordsOverride] : [...VOCAB];
+  if (S.mode === 'build') {
+    pool = pool.filter(isBuildable);
+    if (pool.length === 0) pool = [...VOCAB].filter(isBuildable); // fallback
+  }
+  S.words = shuffle(pool);
+  S.wrong = []; S.idx = 0; S.score = 0; S.done = false;
   closeSettings();
-  showScreen('game');
-  renderWord();
+  const screenMap = { write:'game', multiple:'game', flash:'flash', build:'build' };
+  showScreen(screenMap[S.mode]);
+  const renderMap = { write: renderWord, multiple: renderWord, flash: renderFlash, build: renderBuild };
+  renderMap[S.mode]();
 }
 
-/* ================================================================
-   GAME — RENDER WORD
-================================================================ */
-function renderWord() {
-  const w = S.words[S.idx];
-  S.done  = false;
-
-  // Progress bar
-  progTxt.textContent  = `Sana ${S.idx + 1} / ${S.words.length}`;
-  scoreTxt.textContent = `Pisteet: ${S.score}`;
-  progFill.style.width = `${(S.idx / S.words.length) * 100}%`;
-
-  // Direction hint
-  const { sourceLanguage:sl, targetLanguage:tl, sourceFlagEmoji:sf, targetFlagEmoji:tf } = LANG;
-  dirHint.textContent = S.reversed ? `${tf} ${tl} → ${sl} ${sf}` : `${sf} ${sl} → ${tl} ${tf}`;
-
-  // Question word
-  wordTxt.textContent = question(w);
-
-  // Reset feedback & buttons
-  fb.className = 'fb';
-  fb.innerHTML = '';
-  btnNext.classList.remove('visible');
-
-  if (S.mode === 'write') {
-    writeWrap.classList.remove('hidden');
-    choiceWrap.classList.add('hidden');
-    btnCheck.style.display = '';
-    answerInput.value    = '';
-    answerInput.disabled = false;
-    // slight delay so the screen transition finishes first
-    setTimeout(() => answerInput.focus(), 80);
-  } else {
-    writeWrap.classList.add('hidden');
-    choiceWrap.classList.remove('hidden');
-    btnCheck.style.display = 'none';
-    buildChoices(w);
-  }
-}
-
-/* ================================================================
-   WRITE MODE — CHECK
-================================================================ */
-function checkWrite() {
-  if (S.done) { advanceWord(); return; }
-  const w    = S.words[S.idx];
-  const user = norm(answerInput.value);
-  if (!user) return;
-
-  const full = norm(answer(w));
-  const core = norm(answerCore(w));
-  const art  = !S.reversed ? w.article : null;
-
-  let status;
-  if (user === full) {
-    status = 'perfect';
-  } else if (art && (user === core || user === norm(w.word))) {
-    status = 'partial';
-  } else {
-    status = 'wrong';
-  }
-
-  answerInput.disabled = true;
-  btnCheck.style.display = 'none';
-  S.done = true;
-
-  if (status === 'perfect') {
-    S.score++;
-    showFb('ok', `✅ <strong>Täysin oikein!</strong><br><em>${answer(w)}</em>`);
-  } else if (status === 'partial') {
-    S.score++;
-    showFb('warn', `⚠️ <strong>Oikein – muista artikkeli!</strong><br>Oikea muoto: <em>${answer(w)}</em>`);
-  } else {
-    S.wrong.push(w);
-    showFb('err', `❌ <strong>Väärin.</strong> Oikea vastaus: <em>${answer(w)}</em>`);
-  }
-
-  scoreTxt.textContent = `Pisteet: ${S.score}`;
-  btnNext.classList.add('visible');
-  btnNext.focus();
-}
-
-/* ================================================================
-   MULTIPLE CHOICE — BUILD & HANDLE
-================================================================ */
-function buildChoices(correct) {
-  // 3 distractors from whole VOCAB pool (not just current game words) for variety
-  const pool = VOCAB.filter(w => answer(w) !== answer(correct));
-  const opts = shuffle([correct, ...shuffle(pool).slice(0, 3)]);
-
-  choicesGrid.innerHTML = '';
-  opts.forEach(opt => {
-    const btn = document.createElement('button');
-    btn.className   = 'choice';
-    btn.textContent = answer(opt);
-    btn.addEventListener('click', () => pickChoice(btn, opt, correct));
-    choicesGrid.appendChild(btn);
-  });
-}
-
-function pickChoice(clicked, chosen, correct) {
-  if (S.done) return;
-  S.done = true;
-
-  const isOk = answer(chosen) === answer(correct);
-
-  choicesGrid.querySelectorAll('.choice').forEach(b => {
-    b.disabled = true;
-    if (norm(b.textContent) === norm(answer(correct))) {
-      b.classList.add('correct');
-    } else if (b === clicked && !isOk) {
-      b.classList.add('wrong');
-    } else {
-      b.classList.add('dim');
-    }
-  });
-
-  if (isOk) {
-    S.score++;
-    showFb('ok', `✅ Oikein! <em>${answer(correct)}</em>`);
-  } else {
-    S.wrong.push(correct);
-    showFb('err', `❌ Väärin! Oikea: <em>${answer(correct)}</em>`);
-  }
-
-  scoreTxt.textContent = `Pisteet: ${S.score}`;
-  btnNext.classList.add('visible');
-  btnNext.focus();
-}
-
-/* ================================================================
-   SHARED HELPERS
-================================================================ */
-function showFb(type, html) {
-  fb.className = `fb show ${type}`;
-  fb.innerHTML = html;
-}
-
-function advanceWord() {
-  S.idx++;
-  if (S.idx >= S.words.length) showResults();
-  else renderWord();
-}
-
-/* ================================================================
+/* ═══════════════════════════════════════════
    RESULTS
-================================================================ */
+═══════════════════════════════════════════ */
 function showResults() {
   showScreen('results');
   const total = S.words.length;
   const pct   = Math.round((S.score / total) * 100);
-  progFill.style.width = '100%';
-
-  resScore.textContent = `${S.score} / ${total}`;
-  resPct.textContent   = `${pct}%`;
-
-  if      (pct === 100) { resEmoji.textContent = '🏆'; resMsg.textContent = 'Täydellinen suoritus!'; }
-  else if (pct >= 80)   { resEmoji.textContent = '💪'; resMsg.textContent = 'Erinomaista työtä!'; }
-  else if (pct >= 50)   { resEmoji.textContent = '👍'; resMsg.textContent = 'Hyvä alku, jatka harjoittelua!'; }
-  else                  { resEmoji.textContent = '📚'; resMsg.textContent = 'Harjoitus tekee mestarin!'; }
-
+  el('resScore').textContent = `${S.score} / ${total}`;
+  el('resPct').textContent   = `${pct}%`;
+  if      (pct===100) { el('resEmoji').textContent='🏆'; el('resMsg').textContent='Täydellinen suoritus!'; }
+  else if (pct>= 80)  { el('resEmoji').textContent='💪'; el('resMsg').textContent='Erinomaista työtä!'; }
+  else if (pct>= 50)  { el('resEmoji').textContent='👍'; el('resMsg').textContent='Hyvä alku, jatka harjoittelua!'; }
+  else                { el('resEmoji').textContent='📚'; el('resMsg').textContent='Harjoitus tekee mestarin!'; }
   if (S.wrong.length > 0) {
-    btnWrong.classList.remove('hidden');
-    btnWrong.textContent = `Harjoittele väärät uudelleen (${S.wrong.length}) 🔁`;
+    el('btnWrong').classList.remove('hidden');
+    el('btnWrong').textContent = `Harjoittele väärät uudelleen (${S.wrong.length}) 🔁`;
   } else {
-    btnWrong.classList.add('hidden');
+    el('btnWrong').classList.add('hidden');
   }
 }
 
-/* ================================================================
-   EVENT LISTENERS
-================================================================ */
-el('btnGo').addEventListener('click',      () => startGame());
-btnCheck.addEventListener('click',         checkWrite);
-btnNext.addEventListener('click',          advanceWord);
-btnRestart.addEventListener('click',       () => startGame());
-btnWrong.addEventListener('click',         () => startGame([...S.wrong]));
-btnQuit.addEventListener('click',          () => { closeSettings(); showScreen('start'); updateStartUI(); });
+/* ═══════════════════════════════════════════
+   SHARED FEEDBACK HELPER
+═══════════════════════════════════════════ */
+function showFb(fbId, type, html) {
+  const f = el(fbId);
+  f.className = `fb show ${type}`;
+  f.innerHTML = html;
+}
 
-answerInput.addEventListener('keydown', e => {
-  if (e.key !== 'Enter') return;
-  e.preventDefault();
-  if (!S.done) checkWrite();
-  else advanceWord();
+/* ═══════════════════════════════════════════
+   WRITE & MULTIPLE CHOICE MODE
+═══════════════════════════════════════════ */
+function renderWord() {
+  const w = S.words[S.idx];
+  S.done = false;
+  el('progTxt').textContent  = `Sana ${S.idx+1} / ${S.words.length}`;
+  el('scoreTxt').textContent = `Pisteet: ${S.score}`;
+  el('progFill').style.width = `${(S.idx/S.words.length)*100}%`;
+  el('dirHint').textContent  = langHint();
+  el('wordTxt').textContent  = question(w);
+  el('fb').className = 'fb'; el('fb').innerHTML = '';
+  el('btnNext').classList.remove('vis');
+
+  if (S.mode === 'write') {
+    el('writeWrap').classList.remove('hidden');
+    el('choiceWrap').classList.add('hidden');
+    el('btnCheck').style.display = '';
+    el('answerInput').value = ''; el('answerInput').disabled = false;
+    setTimeout(() => el('answerInput').focus(), 80);
+  } else {
+    el('writeWrap').classList.add('hidden');
+    el('choiceWrap').classList.remove('hidden');
+    el('btnCheck').style.display = 'none';
+    buildChoices(w);
+  }
+}
+
+function checkWrite() {
+  if (S.done) { advanceWord(); return; }
+  const w = S.words[S.idx];
+  const user = norm(el('answerInput').value);
+  if (!user) return;
+  const full = norm(answer(w));
+  const core = norm(answerCore(w));
+  const art  = articleOf(w);
+  let status;
+  if      (user === full)                              status = 'perfect';
+  else if (art && (user===core || user===norm(w.word))) status = 'partial';
+  else                                                 status = 'wrong';
+  el('answerInput').disabled = true;
+  el('btnCheck').style.display = 'none';
+  S.done = true;
+  if (status==='perfect') { S.score++; showFb('fb','ok',  `✅ <strong>Täysin oikein!</strong><br><em>${answer(w)}</em>`); }
+  else if (status==='partial') { S.score++; showFb('fb','warn',`⚠️ <strong>Oikein – muista artikkeli!</strong><br>Oikea muoto: <em>${answer(w)}</em>`); }
+  else { S.wrong.push(w); showFb('fb','err', `❌ <strong>Väärin.</strong> Oikea vastaus: <em>${answer(w)}</em>`); }
+  el('scoreTxt').textContent = `Pisteet: ${S.score}`;
+  el('btnNext').classList.add('vis'); el('btnNext').focus();
+}
+
+function buildChoices(correct) {
+  const pool = VOCAB.filter(w => answer(w) !== answer(correct));
+  const opts = shuffle([correct, ...shuffle(pool).slice(0,3)]);
+  el('choicesGrid').innerHTML = '';
+  opts.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'choice'; btn.textContent = answer(opt);
+    btn.addEventListener('click', () => pickChoice(btn, opt, correct));
+    el('choicesGrid').appendChild(btn);
+  });
+}
+function pickChoice(clicked, chosen, correct) {
+  if (S.done) return;
+  S.done = true;
+  const isOk = answer(chosen) === answer(correct);
+  el('choicesGrid').querySelectorAll('.choice').forEach(b => {
+    b.disabled = true;
+    if (norm(b.textContent) === norm(answer(correct))) b.classList.add('correct');
+    else if (b===clicked && !isOk)                    b.classList.add('wrong');
+    else                                               b.classList.add('dim');
+  });
+  if (isOk) { S.score++; showFb('fb','ok', `✅ Oikein! <em>${answer(correct)}</em>`); }
+  else      { S.wrong.push(correct); showFb('fb','err',`❌ Väärin! Oikea: <em>${answer(correct)}</em>`); }
+  el('scoreTxt').textContent = `Pisteet: ${S.score}`;
+  el('btnNext').classList.add('vis'); el('btnNext').focus();
+}
+
+function advanceWord() {
+  S.idx++;
+  if (S.idx >= S.words.length) showResults(); else renderWord();
+}
+
+/* ═══════════════════════════════════════════
+   FLASHCARD MODE
+═══════════════════════════════════════════ */
+function renderFlash() {
+  const w = S.words[S.idx];
+  S.done = false; S.flipped = false;
+  el('fProgTxt').textContent  = `Kortti ${S.idx+1} / ${S.words.length}`;
+  el('fScoreTxt').textContent = `Pisteet: ${S.score}`;
+  el('fProgFill').style.width = `${(S.idx/S.words.length)*100}%`;
+  el('fDirHint').textContent  = langHint();
+
+  const { sourceLanguage:sl, targetLanguage:tl } = LANG;
+  el('cardFrontLabel').textContent = S.reversed ? tl : sl;
+  el('cardBackLabel').textContent  = S.reversed ? sl : tl;
+  el('cardFront').textContent = question(w);
+  el('cardBack').textContent  = answer(w);
+
+  el('card3d').classList.remove('flipped');
+  el('cardActions').classList.remove('vis');
+  el('cardKeyHints').classList.remove('vis');
+  el('cardTapHint').style.opacity = '1';
+  el('cardTapHint').textContent = 'Napauta korttia kääntääksesi ↕';
+  el('cardScene').focus();
+}
+
+function flipCard() {
+  if (S.done) return;
+  S.flipped = !S.flipped;
+  el('card3d').classList.toggle('flipped', S.flipped);
+  if (S.flipped) {
+    el('cardTapHint').style.opacity = '0';
+    el('cardActions').classList.add('vis');
+    el('cardKeyHints').classList.add('vis');
+  } else {
+    el('cardTapHint').style.opacity = '1';
+    el('cardActions').classList.remove('vis');
+    el('cardKeyHints').classList.remove('vis');
+  }
+}
+
+function markCard(correct) {
+  if (!S.flipped || S.done) return;
+  S.done = true;
+  if (correct) S.score++;
+  else         S.wrong.push(S.words[S.idx]);
+  el('fScoreTxt').textContent = `Pisteet: ${S.score}`;
+  el('cardActions').classList.remove('vis');
+  el('cardKeyHints').classList.remove('vis');
+  el('cardTapHint').style.opacity = '1';
+  el('cardTapHint').textContent = correct ? '✅ Merkitty oikein' : '❌ Merkitty väärin';
+  // Advance after short pause so user sees the result
+  setTimeout(advanceFlash, 700);
+}
+
+function advanceFlash() {
+  S.idx++;
+  if (S.idx >= S.words.length) showResults(); else renderFlash();
+}
+
+el('cardScene').addEventListener('click', flipCard);
+el('cardScene').addEventListener('keydown', e => {
+  if (e.key === ' '          ) { e.preventDefault(); flipCard(); }
+});
+el('btnCardRight').addEventListener('click', e => { e.stopPropagation(); markCard(true);  });
+el('btnCardWrong').addEventListener('click', e => { e.stopPropagation(); markCard(false); });
+
+/* ═══════════════════════════════════════════
+   WORD BUILDER MODE
+═══════════════════════════════════════════ */
+function renderBuild() {
+  const w = S.words[S.idx];
+  S.done = false;
+  S.buildTarget = S.reversed ? w.source : w.word;
+  S.buildTiles  = shuffle(S.buildTarget.split('').map((char,i) => ({ char, id:i, used:false })));
+  S.buildPlaced = [];
+
+  el('bProgTxt').textContent  = `Sana ${S.idx+1} / ${S.words.length}`;
+  el('bScoreTxt').textContent = `Pisteet: ${S.score}`;
+  el('bProgFill').style.width = `${(S.idx/S.words.length)*100}%`;
+  el('bDirHint').textContent  = langHint();
+  el('buildQuestion').textContent = question(w);
+
+  // Article badge
+  const art = articleOf(w);
+  const artEl = el('buildArticle');
+  if (art && !S.reversed) {
+    artEl.textContent = art; artEl.style.display = '';
+  } else {
+    artEl.style.display = 'none';
+  }
+
+  el('buildLenHint').textContent = `${S.buildTarget.length} kirjainta`;
+  el('bFb').className = 'fb'; el('bFb').innerHTML = '';
+  el('btnBuildCheck').style.display = '';
+  el('btnBuildNext').classList.remove('vis');
+  el('btnBuildClear').disabled = false;
+
+  renderBuildSlots();
+  renderBuildTiles();
+}
+
+function renderBuildSlots() {
+  const slotsEl = el('buildSlots');
+  slotsEl.innerHTML = '';
+  for (let i = 0; i < S.buildTarget.length; i++) {
+    const slot = document.createElement('div');
+    if (i < S.buildPlaced.length) {
+      const tile = S.buildTiles.find(t => t.id === S.buildPlaced[i]);
+      slot.className = 'build-slot filled';
+      slot.textContent = tile.char;
+      const idx = i;
+      slot.addEventListener('click', () => { if (!S.done) removePlaced(idx); });
+    } else {
+      slot.className = 'build-slot empty';
+    }
+    slotsEl.appendChild(slot);
+  }
+}
+
+function renderBuildTiles() {
+  const tilesEl = el('buildTiles');
+  tilesEl.innerHTML = '';
+  S.buildTiles.forEach((tile, i) => {
+    const t = document.createElement('div');
+    t.className = 'build-tile' + (tile.used ? ' used' : '');
+    t.textContent = tile.char;
+    if (!tile.used) {
+      t.addEventListener('click', () => { if (!S.done) placeTile(i); });
+    }
+    tilesEl.appendChild(t);
+  });
+}
+
+function placeTile(i) {
+  if (S.buildPlaced.length >= S.buildTarget.length) return;
+  S.buildTiles[i].used = true;
+  S.buildPlaced.push(S.buildTiles[i].id);
+  renderBuildSlots();
+  renderBuildTiles();
+}
+
+function removePlaced(slotIdx) {
+  const tileId = S.buildPlaced[slotIdx];
+  const tile = S.buildTiles.find(t => t.id === tileId);
+  if (tile) tile.used = false;
+  S.buildPlaced.splice(slotIdx, 1);
+  renderBuildSlots();
+  renderBuildTiles();
+}
+
+function clearBuild() {
+  S.buildTiles.forEach(t => t.used = false);
+  S.buildPlaced = [];
+  renderBuildSlots();
+  renderBuildTiles();
+}
+
+function checkBuild() {
+  if (S.done) { advanceBuild(); return; }
+  if (S.buildPlaced.length < S.buildTarget.length) {
+    showFb('bFb','warn','⚠️ Lisää vielä kirjaimia!');
+    return;
+  }
+  const userWord = S.buildTiles
+    .filter(t => S.buildPlaced.includes(t.id))
+    .sort((a,b) => S.buildPlaced.indexOf(a.id) - S.buildPlaced.indexOf(b.id))
+    .map(t => t.char).join('');
+
+  const correct = norm(userWord) === norm(S.buildTarget);
+  S.done = true;
+  el('btnBuildCheck').style.display = 'none';
+  el('btnBuildClear').disabled = true;
+
+  // Colour the slots
+  el('buildSlots').querySelectorAll('.build-slot.filled').forEach((slot, i) => {
+    slot.classList.remove('filled');
+    slot.classList.add(correct ? 'correct-slot' : 'wrong-slot');
+  });
+
+  const w = S.words[S.idx];
+  if (correct) {
+    S.score++;
+    showFb('bFb','ok', `✅ <strong>Oikein!</strong> ${articleOf(w) ? articleOf(w)+' ' : ''}${S.buildTarget}`);
+  } else {
+    S.wrong.push(w);
+    showFb('bFb','err', `❌ <strong>Väärin.</strong> Oikea: <em>${answer(w)}</em>`);
+  }
+  el('bScoreTxt').textContent = `Pisteet: ${S.score}`;
+  el('btnBuildNext').classList.add('vis'); el('btnBuildNext').focus();
+}
+
+function advanceBuild() {
+  S.idx++;
+  if (S.idx >= S.words.length) showResults(); else renderBuild();
+}
+
+el('btnBuildClear').addEventListener('click', clearBuild);
+el('btnBuildCheck').addEventListener('click', checkBuild);
+el('btnBuildNext').addEventListener('click',  advanceBuild);
+
+/* ═══════════════════════════════════════════
+   GLOBAL KEYBOARD (flashcard arrows, enter)
+═══════════════════════════════════════════ */
+document.addEventListener('keydown', e => {
+  // Flashcard keyboard shortcuts
+  if (S.mode==='flash' && el('flashScreen').classList.contains('active')) {
+    if (e.key==='ArrowUp'||e.key==='ArrowDown') { e.preventDefault(); flipCard(); return; }
+    if (e.key==='ArrowRight') { e.preventDefault(); markCard(true);  return; }
+    if (e.key==='ArrowLeft')  { e.preventDefault(); markCard(false); return; }
+  }
+  // Enter in write mode
+  if (S.mode==='write' && el('gameScreen').classList.contains('active')) {
+    if (e.key==='Enter') {
+      e.preventDefault();
+      if (!S.done) checkWrite(); else advanceWord();
+    }
+  }
 });
 
-/* ================================================================
+/* ═══════════════════════════════════════════
+   RESULTS BUTTONS & SHARED EVENTS
+═══════════════════════════════════════════ */
+el('btnGo').addEventListener('click',      () => startGame());
+el('btnCheck').addEventListener('click',   checkWrite);
+el('btnNext').addEventListener('click',    advanceWord);
+el('btnRestart').addEventListener('click', () => startGame());
+el('btnWrong').addEventListener('click',   () => startGame([...S.wrong]));
+el('btnQuit').addEventListener('click',    () => { closeSettings(); showScreen('start'); updateStartUI(); });
+
+el('answerInput').addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  if (!S.done) checkWrite(); else advanceWord();
+});
+
+/* ═══════════════════════════════════════════
+   iOS HINT
+═══════════════════════════════════════════ */
+if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !navigator.standalone) {
+  el('iosHint').style.display = 'block';
+}
+
+/* ═══════════════════════════════════════════
    INIT
-================================================================ */
+═══════════════════════════════════════════ */
 updateDirUI();
 updateStartUI();
 </script>
-
-<div id="iosHint">
-  Lisää kotinäytölle: paina <strong>⎋ Jaa</strong> → <strong>Lisää Koti-valikkoon</strong>
-  <button onclick="this.parentElement.style.display='none'">✕</button>
-</div>
-<style>
-#iosHint {
-  display: none;
-  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
-  background: rgba(15,10,46,0.92); backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.15);
-  color: white; font-size: 13px; padding: 12px 16px;
-  border-radius: 14px; z-index: 999; width: 280px; text-align: center;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-}
-#iosHint button {
-  background: none; border: none; color: rgba(255,255,255,0.6);
-  font-size: 16px; cursor: pointer; margin-left: 8px;
-}
-</style>
-<script>
-  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  const isStandalone = window.navigator.standalone === true;
-  if (isIos && !isStandalone) document.getElementById('iosHint').style.display = 'block';
-</script>
-  
 </body>
 </html>
