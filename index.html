@@ -308,6 +308,23 @@ body {
    WRITE MODE
 ═══════════════════════════════════════════ */
 .game-inner { padding: 26px 26px 22px; }
+
+/* Erikoismerkkien pikanapit */
+.char-btns {
+  display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;
+}
+.char-btn {
+  padding: 6px 13px; border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.08);
+  color: var(--tp); font-family: var(--font); font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: background 0.15s, transform 0.1s;
+  user-select: none; -webkit-user-select: none;
+}
+.char-btn:hover  { background: rgba(255,255,255,0.18); }
+.char-btn:active { transform: scale(0.9); }
+.char-btn:disabled { opacity: 0.28; pointer-events: none; }
+
 #answerInput {
   width: 100%; background: rgba(255,255,255,0.09);
   border: 1.5px solid rgba(255,255,255,0.2); border-radius: var(--rm);
@@ -504,7 +521,36 @@ body {
 }
 
 /* ═══════════════════════════════════════════
-   UTILITIES & RESPONSIVE
+   CUSTOM CURSOR
+═══════════════════════════════════════════ */
+* { cursor: none !important; }
+
+#customCursor {
+  position: fixed;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s ease, opacity 0.3s ease;
+  /* glowing orb */
+  background: radial-gradient(circle at 35% 35%,
+    rgba(255,255,255,0.95),
+    rgba(176,110,255,0.85) 45%,
+    rgba(255,110,199,0.6) 75%,
+    transparent 100%);
+  box-shadow:
+    0 0 8px  rgba(176,110,255,0.9),
+    0 0 20px rgba(255,110,199,0.6),
+    0 0 40px rgba(110,184,255,0.3);
+  opacity: 0; /* hidden until mouse moves */
+}
+#customCursor.visible { opacity: 1; }
+#customCursor.clicking {
+  transform: translate(-50%, -50%) scale(0.7);
+}
+
+/* ═══════════════════════════════════════════
 ═══════════════════════════════════════════ */
 .hidden { display: none !important; }
 
@@ -535,6 +581,9 @@ body {
 <div class="bg-orbs" aria-hidden="true">
   <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
 </div>
+
+<!-- Custom cursor orb -->
+<div id="customCursor"></div>
 
 <!-- Settings button -->
 <button id="settingsBtn" aria-label="Asetukset" aria-expanded="false">⚙️</button>
@@ -578,6 +627,16 @@ body {
       <div id="writeWrap">
         <input id="answerInput" type="text" autocomplete="off" autocorrect="off"
                autocapitalize="off" spellcheck="false" placeholder="Kirjoita vastaus…">
+        <div class="char-btns" id="charBtns">
+          <button class="char-btn" data-char="ä">ä</button>
+          <button class="char-btn" data-char="ö">ö</button>
+          <button class="char-btn" data-char="ü">ü</button>
+          <button class="char-btn" data-char="ß">ß</button>
+          <button class="char-btn" data-char="Ä">Ä</button>
+          <button class="char-btn" data-char="Ö">Ö</button>
+          <button class="char-btn" data-char="Ü">Ü</button>
+          <button class="char-btn" data-char="ẞ">ẞ</button>
+        </div>
       </div>
       <div id="choiceWrap" class="hidden">
         <div class="choices" id="choicesGrid"></div>
@@ -860,7 +919,7 @@ function updateStartUI() {
     el('startH1').textContent = `${sl}–${tl} Sanastopeli`;
     el('langPill').innerHTML  = `${sf} ${sl} &nbsp;→&nbsp; ${tl} ${tf}`;
   }
-  const modeLabels = { write:'kirjoittamalla', multiple:'monivalinnalla', flash:'kääntökorteilla', build:'rakentamalla sanoja niiden kirjaimista' };
+  const modeLabels = { write:'kirjoittamalla', multiple:'monivalinnalla', flash:'kääntökorteilla', build:'rakentamalla' };
   const art = (S.mode !== 'build' && !S.reversed) ? '<br>Saat pisteen, vaikka artikkeli unohtuisi!' : '';
   el('startDesc').innerHTML = `Harjoittele sanastoa ${modeLabels[S.mode]}.${art}`;
 }
@@ -925,6 +984,7 @@ function renderWord() {
     el('writeWrap').classList.remove('hidden'); el('choiceWrap').classList.add('hidden');
     el('btnCheck').style.display = '';
     el('answerInput').value = ''; el('answerInput').disabled = false;
+    document.querySelectorAll('.char-btn').forEach(b => b.disabled = false);
     setTimeout(() => el('answerInput').focus(), 80);
   } else {
     el('writeWrap').classList.add('hidden'); el('choiceWrap').classList.remove('hidden');
@@ -933,15 +993,20 @@ function renderWord() {
   }
 }
 function checkWrite() {
-  if (S.done) { advanceWord(); return; }
+  if (S.done) return; // Enter after checking is handled by btnNext / keydown listener
   const w = S.words[S.idx], user = norm(el('answerInput').value);
   if (!user) return;
   const full = norm(answer(w)), core = norm(answerCore(w)), art = articleOf(w);
+  const articles = ['der','die','das','ein','eine'];
+  // Onko käyttäjä kirjoittanut jonkin artikkelin + oikean sanan?
+  const userWithoutArticle = user.replace(/^(der|die|das|ein|eine)\s+/i,'').trim();
   let status;
-  if      (user === full)                                status = 'perfect';
-  else if (art && (user===core||user===norm(w.word)))    status = 'partial';
-  else                                                   status = 'wrong';
+  if      (user === full)                                          status = 'perfect';
+  else if (art && (user === core || user === norm(w.word)))        status = 'partial'; // artikkeli puuttuu
+  else if (art && userWithoutArticle === core)                     status = 'partial'; // väärä artikkeli
+  else                                                             status = 'wrong';
   el('answerInput').disabled = true; el('btnCheck').style.display = 'none'; S.done = true;
+  document.querySelectorAll('.char-btn').forEach(b => b.disabled = true);
   if (status==='perfect') { S.score++; showFb('fb','ok',`✅ <strong>Täysin oikein!</strong><br><em>${answer(w)}</em>`); }
   else if (status==='partial') { S.score++; showFb('fb','warn',`⚠️ <strong>Oikein – muista artikkeli!</strong><br>Oikea muoto: <em>${answer(w)}</em>`); }
   else { S.wrong.push(w); showFb('fb','err',`❌ <strong>Väärin.</strong> Oikea vastaus: <em>${answer(w)}</em>`); }
@@ -1150,6 +1215,24 @@ document.addEventListener('keydown', e => {
   }
 });
 
+/* ── Erikoismerkkien pikanapit ── */
+document.querySelectorAll('.char-btn').forEach(btn => {
+  btn.addEventListener('mousedown', e => {
+    e.preventDefault(); // estää focus siirtymisen pois kentästä
+  });
+  btn.addEventListener('click', () => {
+    const input = el('answerInput');
+    if (input.disabled) return;
+    const char  = btn.dataset.char;
+    const start = input.selectionStart;
+    const end   = input.selectionEnd;
+    input.value = input.value.slice(0, start) + char + input.value.slice(end);
+    // siirretään kursori lisätyn merkin jälkeen
+    input.setSelectionRange(start + char.length, start + char.length);
+    input.focus();
+  });
+});
+
 /* ── Shared buttons ── */
 el('btnGo').addEventListener('click',      () => startGame());
 el('btnCheck').addEventListener('click',   checkWrite);
@@ -1158,9 +1241,30 @@ el('btnRestart').addEventListener('click', () => startGame());
 el('btnWrong').addEventListener('click',   () => startGame([...S.wrong]));
 el('btnQuit').addEventListener('click',    () => { closeSettings(); showScreen('start'); updateStartUI(); });
 el('answerInput').addEventListener('keydown', e => {
-  if (e.key !== 'Enter') return; e.preventDefault();
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  e.stopPropagation(); // estää kuplimisen document-kuuntelijaan
   if (!S.done) checkWrite(); else advanceWord();
 });
+
+/* ── Mukautettu kursori ── */
+(function () {
+  const cursor = el('customCursor');
+  // Älä näytä touch-laitteilla
+  if (window.matchMedia('(pointer: coarse)').matches) return;
+
+  let cx = -100, cy = -100;
+
+  document.addEventListener('mousemove', e => {
+    cx = e.clientX; cy = e.clientY;
+    cursor.style.left = cx + 'px';
+    cursor.style.top  = cy + 'px';
+    cursor.classList.add('visible');
+  });
+  document.addEventListener('mouseleave', () => cursor.classList.remove('visible'));
+  document.addEventListener('mousedown',  () => cursor.classList.add('clicking'));
+  document.addEventListener('mouseup',    () => cursor.classList.remove('clicking'));
+})();
 
 /* ── iOS hint ── */
 if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !navigator.standalone) {
