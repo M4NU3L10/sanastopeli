@@ -2,7 +2,7 @@
 <html lang="fi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Sanastopeli</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
 <link rel="apple-touch-icon" href="icon.png">
@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Sanastopeli">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0f0a2e">
+<meta name="theme-color" content="#1a1a2e">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════
@@ -28,97 +28,92 @@
   --ts: rgba(255,255,255,0.60);
   --pink: #ff6ec7; --blue: #6eb8ff; --purple: #b06eff;
   --green: #4ade80; --yellow: #fbbf24; --red: #f87171;
+  --bg: linear-gradient(135deg,#1a1a2e,#16213e,#0f3460,#533483);
 }
-html { height: 100%; }
+
+/* FIX 3: html background fills safe-area gaps (white bars) */
+html {
+  height: 100%;
+  background: #1a1a2e;
+}
 body {
   font-family: var(--font); color: var(--tp); overflow-x: hidden;
-  min-height: 100vh; display: flex; flex-direction: column; align-items: center;
-  padding: 16px 16px 116px;
-  background: linear-gradient(135deg,#1a1a2e,#16213e,#0f3460,#533483);
+  min-height: 100vh;
+  min-height: 100dvh; /* dynamic viewport – removes Safari scroll-bar gap */
+  display: flex; flex-direction: column; align-items: center;
+  /* safe-area padding for notch / home-indicator */
+  padding: calc(16px + env(safe-area-inset-top, 0px))
+           calc(16px + env(safe-area-inset-right, 0px))
+           calc(116px + env(safe-area-inset-bottom, 0px))
+           calc(16px + env(safe-area-inset-left, 0px));
+  background: var(--bg);
   background-attachment: fixed; transition: background 0.9s ease;
 }
 
 /* ═══════════════════════════════════════════
-   LOADER
+   LOADER  (FIX 2: min 1s, restyled)
 ═══════════════════════════════════════════ */
-
 #appLoader {
   position: fixed;
-  inset: 0;
+  /* extend under status bar and home indicator */
+  top: calc(-1 * env(safe-area-inset-top, 0px));
+  right: calc(-1 * env(safe-area-inset-right, 0px));
+  bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
+  left: calc(-1 * env(safe-area-inset-left, 0px));
   z-index: 9999;
   background: linear-gradient(135deg,#1a1a2e,#16213e,#0f3460,#533483);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.6s ease, visibility 0.6s ease;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.7s ease, visibility 0.7s ease;
 }
-
-#appLoader.hide {
-  opacity: 0;
-  visibility: hidden;
-}
+#appLoader.hide { opacity: 0; visibility: hidden; pointer-events: none; }
 
 .loader-inner {
-  text-align: center;
-  position: relative;
-  animation: fadeUp 0.6s ease;
+  text-align: center; position: relative;
+  animation: fadeUp 0.55s ease;
 }
-
 .loader-glow {
-  position: absolute;
-  width: 180px;
-  height: 180px;
-  background: radial-gradient(circle, rgba(176,110,255,0.4), transparent 70%);
-  border-radius: 50%;
-  filter: blur(40px);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  animation: pulse 2.5s ease-in-out infinite;
+  position: absolute; width: 220px; height: 220px;
+  background: radial-gradient(circle, rgba(176,110,255,0.45), transparent 70%);
+  border-radius: 50%; filter: blur(50px);
+  top: 50%; left: 50%; transform: translate(-50%, -60%);
+  animation: loaderPulse 2s ease-in-out infinite alternate;
 }
-
+@keyframes loaderPulse {
+  from { opacity: 0.5; transform: translate(-50%, -60%) scale(1); }
+  to   { opacity: 0.9; transform: translate(-50%, -60%) scale(1.25); }
+}
 .loader-logo {
-  font-size: 64px;
-  margin-bottom: 16px;
-  animation: float 3s ease-in-out infinite;
+  font-size: 72px; line-height: 1;
+  margin-bottom: 18px; position: relative;
+  animation: loaderFloat 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 24px rgba(176,110,255,0.6));
 }
-
+@keyframes loaderFloat {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
 .loader-title {
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 26px;
-  letter-spacing: 0.05em;
-  background: linear-gradient(135deg,var(--pink),var(--blue));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 26px; font-weight: 800; letter-spacing: 0.04em;
+  margin-bottom: 8px; position: relative;
+  background: linear-gradient(130deg, var(--pink), var(--blue));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
 }
-
+.loader-subtitle {
+  font-size: 13px; font-weight: 500; color: var(--ts);
+  margin-bottom: 32px; letter-spacing: 0.08em; text-transform: uppercase;
+  position: relative;
+}
 .loader-bar {
-  width: 200px;
-  height: 6px;
-  background: rgba(255,255,255,0.15);
-  border-radius: 100px;
-  overflow: hidden;
-  margin: 0 auto;
+  width: 200px; height: 5px;
+  background: rgba(255,255,255,0.12); border-radius: 100px; overflow: hidden;
+  margin: 0 auto; position: relative;
+  box-shadow: 0 0 12px rgba(176,110,255,0.2);
 }
-
 .loader-bar-fill {
-  height: 100%;
-  width: 0%;
-  border-radius: 100px;
-  background: linear-gradient(90deg,var(--blue),var(--purple),var(--pink));
-  transition: width 0.4s ease;
-}
-
-@keyframes float {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-  100% { transform: translateY(0); }
-}
-
-@keyframes pulse {
-  0% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
-  100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.2); }
+  height: 100%; width: 0%; border-radius: 100px;
+  background: linear-gradient(90deg, var(--blue), var(--purple), var(--pink));
+  transition: width 0.35s ease;
+  box-shadow: 0 0 8px rgba(255,110,199,0.5);
 }
 
 /* ═══════════════════════════════════════════
@@ -146,7 +141,7 @@ body {
    SETTINGS BUTTON
 ═══════════════════════════════════════════ */
 #settingsBtn {
-  position: fixed; top: 14px; left: 14px; z-index: 400;
+  position: fixed; top: calc(14px + env(safe-area-inset-top, 0px)); left: 14px; z-index: 400;
   width: 46px; height: 46px; border-radius: 50%;
   background: var(--glass); border: 1px solid var(--border);
   backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
@@ -162,7 +157,7 @@ body {
    SETTINGS PANEL
 ═══════════════════════════════════════════ */
 #settingsPanel {
-  position: fixed; top: 70px; left: 14px; z-index: 400; width: 270px;
+  position: fixed; top: calc(70px + env(safe-area-inset-top, 0px)); left: 14px; z-index: 400; width: 270px;
   background: rgba(15,8,35,0.7); border: 1px solid var(--border);
   backdrop-filter: blur(40px) saturate(220%); -webkit-backdrop-filter: blur(40px) saturate(220%);
   border-radius: var(--rl); padding: 18px 16px;
@@ -213,10 +208,12 @@ body {
 .btn-quit.vis { display: block; }
 
 /* ═══════════════════════════════════════════
-   BOTTOM NAV  (4 buttons)
+   BOTTOM NAV — FIX 3: safe-area bottom
 ═══════════════════════════════════════════ */
 #bottomNav {
-  position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 400;
+  position: fixed;
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  left: 50%; transform: translateX(-50%); z-index: 400;
   display: flex;
   background: rgba(15,8,35,0.65); border: 1px solid var(--border);
   backdrop-filter: blur(40px) saturate(220%); -webkit-backdrop-filter: blur(40px) saturate(220%);
@@ -342,21 +339,29 @@ body {
 
 /* ═══════════════════════════════════════════
    FLASHCARD MODE
+   FIX 1: backface-visibility + transition fixes
 ═══════════════════════════════════════════ */
 .flash-inner { padding: 26px 26px 22px; }
-
 .card-scene {
   perspective: 900px; width: 100%; margin-bottom: 14px; cursor: pointer;
 }
 .card-3d {
   width: 100%; height: 190px; position: relative;
   transform-style: preserve-3d;
-  transition: transform 0.55s cubic-bezier(0.4,0,0.2,1);
+  transition: transform 0.52s cubic-bezier(0.4,0,0.2,1);
+  /* FIX 1a: force GPU layer to prevent desktop text bleed-through */
+  will-change: transform;
 }
 .card-3d.flipped { transform: rotateY(180deg); }
+.card-3d.no-transition { transition: none !important; }
+
 .card-face {
-  position: absolute; inset: 0; backface-visibility: hidden;
-  -webkit-backface-visibility: hidden; border-radius: var(--rl);
+  position: absolute; inset: 0;
+  /* FIX 1b: both prefixed and un-prefixed, plus translateZ to create own layer */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);           /* front face — own compositing layer */
+  border-radius: var(--rl);
   display: flex; flex-direction: column; align-items: center;
   justify-content: center; padding: 24px 20px; text-align: center;
   user-select: none;
@@ -366,7 +371,8 @@ body {
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
 }
 .card-back {
-  transform: rotateY(180deg);
+  /* FIX 1c: combine rotateY AND translateZ in one transform — don't override base translateZ */
+  transform: rotateY(180deg) translateZ(0);
   background: rgba(110,184,255,0.10); border: 1px solid rgba(110,184,255,0.30);
   box-shadow: inset 0 1px 0 rgba(110,184,255,0.15);
 }
@@ -379,7 +385,7 @@ body {
   font-size: 12px; color: var(--ts); text-align: center; margin-bottom: 14px;
   min-height: 18px; transition: opacity 0.3s;
 }
-.card-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; display: none; }
+.card-actions { display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
 .card-actions.vis { display: grid; }
 .btn-card-wrong {
   padding: 14px; border-radius: var(--rm);
@@ -411,7 +417,6 @@ body {
 ═══════════════════════════════════════════ */
 .build-inner { padding: 26px 26px 22px; }
 .build-question { margin-bottom: 16px; }
-
 .build-answer-wrap {
   display: flex; align-items: flex-start; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;
 }
@@ -427,9 +432,7 @@ body {
   display: flex; align-items: center; justify-content: center;
   font-size: 17px; font-weight: 700; transition: background 0.15s, transform 0.12s;
 }
-.build-slot.empty {
-  background: rgba(255,255,255,0.06); border: 1.5px dashed rgba(255,255,255,0.2);
-}
+.build-slot.empty { background: rgba(255,255,255,0.06); border: 1.5px dashed rgba(255,255,255,0.2); }
 .build-slot.filled {
   background: rgba(110,184,255,0.15); border: 1.5px solid rgba(110,184,255,0.4);
   color: var(--blue); cursor: pointer;
@@ -437,7 +440,6 @@ body {
 .build-slot.filled:hover { background: rgba(248,113,113,0.15); border-color: rgba(248,113,113,0.5); color: var(--red); }
 .build-slot.correct-slot { background: rgba(74,222,128,0.18); border-color: var(--green); color: var(--green); }
 .build-slot.wrong-slot   { background: rgba(248,113,113,0.18); border-color: var(--red);   color: var(--red); }
-
 .build-tiles-wrap {
   display: flex; flex-wrap: wrap; gap: 7px; padding: 12px;
   background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
@@ -453,7 +455,6 @@ body {
 .build-tile:hover { background: rgba(255,255,255,0.22); transform: translateY(-3px); }
 .build-tile:active { transform: scale(0.93); }
 .build-tile.used { opacity: 0.18; pointer-events: none; }
-
 .build-controls { display: flex; gap: 8px; margin-bottom: 12px; }
 .btn-build-clear {
   flex: 0 0 auto; padding: 10px 16px; border-radius: var(--rm);
@@ -463,13 +464,6 @@ body {
 }
 .btn-build-clear:hover { background: rgba(255,255,255,0.13); }
 .build-len-hint { font-size: 12px; color: var(--ts); align-self: center; }
-
-/* Skip-word (for non-buildable in build mode) */
-.skip-notice {
-  background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3);
-  border-radius: var(--rm); padding: 10px 14px; color: var(--yellow);
-  font-size: 13px; font-weight: 600; text-align: center; margin-bottom: 12px;
-}
 
 /* ═══════════════════════════════════════════
    RESULTS SCREEN
@@ -496,7 +490,9 @@ body {
    iOS HINT
 ═══════════════════════════════════════════ */
 #iosHint {
-  display: none; position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+  display: none; position: fixed;
+  bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+  left: 50%; transform: translateX(-50%);
   background: rgba(15,10,46,0.92); backdrop-filter: blur(20px);
   border: 1px solid var(--border); color: white; font-size: 13px;
   padding: 12px 16px; border-radius: 14px; z-index: 500; width: 290px;
@@ -508,15 +504,11 @@ body {
 }
 
 /* ═══════════════════════════════════════════
-   UTILITIES
+   UTILITIES & RESPONSIVE
 ═══════════════════════════════════════════ */
 .hidden { display: none !important; }
 
-/* ═══════════════════════════════════════════
-   RESPONSIVE
-═══════════════════════════════════════════ */
 @media (max-width: 440px) {
-  body { padding: 12px 12px 114px; }
   .game-inner, .flash-inner, .build-inner { padding: 20px 16px 18px; }
   .choices { grid-template-columns: 1fr; }
   .nb { padding: 8px 10px; font-size: 9.5px; }
@@ -533,12 +525,13 @@ body {
     <div class="loader-glow"></div>
     <div class="loader-logo">🌍</div>
     <div class="loader-title">Sanastopeli</div>
+    <div class="loader-subtitle">Suomi &nbsp;·&nbsp; Saksa</div>
     <div class="loader-bar">
       <div class="loader-bar-fill" id="loaderBarFill"></div>
     </div>
   </div>
 </div>
-   
+
 <div class="bg-orbs" aria-hidden="true">
   <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
 </div>
@@ -551,7 +544,6 @@ body {
 <div id="settingsPanel" role="dialog" aria-label="Asetukset">
   <div class="set-label">Taustaväri</div>
   <div class="swatches" id="swatchWrap"></div>
-
   <div id="dirSection">
     <div class="set-label set-section">Käännössuunta</div>
     <div class="dir-row" id="dirRow" role="button" tabindex="0" aria-label="Vaihda käännössuunta">
@@ -560,7 +552,6 @@ body {
       <span class="dir-dot"  id="dirDot">↔</span>
     </div>
   </div>
-
   <button class="btn-quit" id="btnQuit">✕ Lopeta peli</button>
 </div>
 
@@ -618,12 +609,10 @@ body {
       </div>
 
       <div class="card-tap-hint" id="cardTapHint">Napauta korttia kääntääksesi ↕</div>
-
       <div class="card-actions" id="cardActions">
         <button class="btn-card-wrong" id="btnCardWrong">✗ &nbsp;Väärin</button>
         <button class="btn-card-right" id="btnCardRight">✓ &nbsp;Oikein</button>
       </div>
-
       <div class="card-key-hints" id="cardKeyHints">
         <span class="key-hint"><span class="key-badge">←</span> Väärin</span>
         <span class="key-hint"><span class="key-badge">↑↓</span> Käännä</span>
@@ -638,23 +627,18 @@ body {
       <div class="prog-row"><span id="bProgTxt"></span><span id="bScoreTxt"></span></div>
       <div class="prog-track"><div class="prog-fill" id="bProgFill" style="width:0%"></div></div>
       <div class="dir-hint" id="bDirHint"></div>
-
       <div class="word-card build-question">
         <div class="word-text" id="buildQuestion"></div>
       </div>
-
       <div class="build-answer-wrap">
         <span class="build-article" id="buildArticle" style="display:none"></span>
         <div class="build-slots" id="buildSlots"></div>
       </div>
-
       <div class="build-tiles-wrap" id="buildTiles"></div>
-
       <div class="build-controls">
         <button class="btn-build-clear" id="btnBuildClear">⌫ Tyhjennä</button>
         <span class="build-len-hint" id="buildLenHint"></span>
       </div>
-
       <div class="fb" id="bFb"></div>
       <button class="btn-check" id="btnBuildCheck">Tarkista ✓</button>
       <button class="btn-next"  id="btnBuildNext">Seuraava ➡</button>
@@ -678,7 +662,7 @@ body {
 
 </main>
 
-<!-- Bottom nav — 4 modes -->
+<!-- Bottom nav -->
 <nav id="bottomNav" aria-label="Pelimuoto">
   <button class="nb" data-mode="flash"    id="nbFlash">   <span class="ni">🪧</span>Kääntökortit</button>
   <button class="nb" data-mode="build"    id="nbBuild">   <span class="ni">🏗️</span>Rakenna   </button>
@@ -692,10 +676,10 @@ body {
   <button onclick="this.parentElement.style.display='none'">✕</button>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     VOCABULARY — muokkaa tätä osioita
-═══════════════════════════════════════════ -->
 <script>
+/* ═══════════════════════════════════════════
+   VOCABULARY
+═══════════════════════════════════════════ */
 const LANG = {
   sourceLanguage:  'Suomi',   targetLanguage:  'Saksa',
   sourceFlagEmoji: '🇫🇮',    targetFlagEmoji: '🇩🇪',
@@ -776,9 +760,6 @@ const VOCAB = [
   { source:"Nähdään pian!",                             target:"Bis bald!",                                   article:null,  word:"Bis bald!" },
 ];
 
-/* ═══════════════════════════════════════════
-   GRADIENT THEMES
-═══════════════════════════════════════════ */
 const GRADS = [
   { name:"Kosminen",     bg:"linear-gradient(135deg,#1a1a2e,#16213e,#0f3460,#533483)", sw:"linear-gradient(135deg,#533483,#0f3460)" },
   { name:"Merivirta",    bg:"linear-gradient(135deg,#0d2137,#0a4a6e,#0a7a6b)",         sw:"linear-gradient(135deg,#0a7a6b,#0a4a6e)" },
@@ -787,71 +768,42 @@ const GRADS = [
   { name:"Kristalli",    bg:"linear-gradient(135deg,#1a0533,#4a0080,#9b00d3)",          sw:"linear-gradient(135deg,#9b00d3,#4a0080)" },
 ];
 
-/* ═══════════════════════════════════════════
-   STATE
-═══════════════════════════════════════════ */
 const S = {
-  mode: 'write',      // 'write' | 'multiple' | 'flash' | 'build'
-  reversed: false,
-  gradIdx: 0,
-  words: [],          // current game words (shuffled)
-  wrong: [],          // words answered incorrectly
-  idx: 0,             // current word index
-  score: 0,
-  done: false,        // current question answered?
-  // flash-specific
+  mode: 'write', reversed: false, gradIdx: 0,
+  words: [], wrong: [], idx: 0, score: 0, done: false,
   flipped: false,
-  // build-specific
-  buildTarget: '',    // word to build (original case, no article)
-  buildTiles: [],     // [{char, id, used}]
-  buildPlaced: [],    // tile ids in placement order
+  buildTarget: '', buildTiles: [], buildPlaced: [],
 };
 
-/* ═══════════════════════════════════════════
-   DOM
-═══════════════════════════════════════════ */
 const el = id => document.getElementById(id);
-
-/* ═══════════════════════════════════════════
-   HELPERS
-═══════════════════════════════════════════ */
 function shuffle(a) { return [...a].sort(() => Math.random() - 0.5); }
 function norm(s)    { return s ? s.toLowerCase().replace(/\s+/g,' ').trim() : ''; }
-
-function question(w) { return S.reversed ? w.target  : w.source; }
-function answer(w)   { return S.reversed ? w.source  : w.target; }
-function answerCore(w){ return S.reversed ? w.source  : w.word;  }
+function question(w){ return S.reversed ? w.target  : w.source; }
+function answer(w)  { return S.reversed ? w.source  : w.target; }
+function answerCore(w){ return S.reversed ? w.source : w.word; }
 function articleOf(w){ return S.reversed ? null : w.article; }
-
-function langHint() {
+function langHint()  {
   const { sourceLanguage:sl, targetLanguage:tl, sourceFlagEmoji:sf, targetFlagEmoji:tf } = LANG;
   return S.reversed ? `${tf} ${tl} → ${sl} ${sf}` : `${sf} ${sl} → ${tl} ${tf}`;
 }
-
-/* isBuildable: only plain words (letters only, 3–18 chars) */
 function isBuildable(w) {
   const word = S.reversed ? w.source : w.word;
   return /^[\wäöüÄÖÜßàâéèêëîïôùûœæÅåøØ]+$/u.test(word) && word.length >= 3 && word.length <= 18;
 }
 
-/* ═══════════════════════════════════════════
-   SCREEN MANAGEMENT
-═══════════════════════════════════════════ */
+/* ── Screen management ── */
 function showScreen(name) {
   ['startScreen','gameScreen','flashScreen','buildScreen','resultsScreen'].forEach(id => {
     el(id).classList.remove('active');
   });
   el(name + 'Screen').classList.add('active');
-
   const inGame = ['game','flash','build'].includes(name);
   el('bottomNav').classList.toggle('hidden', inGame);
   el('dirSection').classList.toggle('hidden', inGame);
   el('btnQuit').classList.toggle('vis', inGame);
 }
 
-/* ═══════════════════════════════════════════
-   SETTINGS — GRADIENTS
-═══════════════════════════════════════════ */
+/* ── Gradients ── */
 GRADS.forEach((g, i) => {
   const sw = document.createElement('div');
   sw.className = 'swatch' + (i === 0 ? ' active' : '');
@@ -865,23 +817,22 @@ function setGrad(i) {
   S.gradIdx = i;
   document.body.style.background = GRADS[i].bg;
   document.body.style.backgroundAttachment = 'fixed';
+  document.documentElement.style.background = GRADS[i].bg.replace(/linear-gradient[^)]+\)/, c => {
+    // Set html bg to first colour stop for safe-area fill
+    const firstCol = c.match(/#[0-9a-f]{6}/i);
+    return firstCol ? firstCol[0] : '#1a1a2e';
+  });
   el('swatchWrap').querySelectorAll('.swatch').forEach((s,j) => s.classList.toggle('active', j===i));
 }
 
-/* ═══════════════════════════════════════════
-   SETTINGS — OPEN / CLOSE
-═══════════════════════════════════════════ */
+/* ── Settings panel ── */
 function openSettings()  {
-  el('settingsPanel').classList.add('open');
-  el('settingsBtn').classList.add('open');
-  el('settingsBtn').setAttribute('aria-expanded','true');
-  el('overlay').classList.add('open');
+  el('settingsPanel').classList.add('open'); el('settingsBtn').classList.add('open');
+  el('settingsBtn').setAttribute('aria-expanded','true'); el('overlay').classList.add('open');
 }
 function closeSettings() {
-  el('settingsPanel').classList.remove('open');
-  el('settingsBtn').classList.remove('open');
-  el('settingsBtn').setAttribute('aria-expanded','false');
-  el('overlay').classList.remove('open');
+  el('settingsPanel').classList.remove('open'); el('settingsBtn').classList.remove('open');
+  el('settingsBtn').setAttribute('aria-expanded','false'); el('overlay').classList.remove('open');
 }
 el('settingsBtn').addEventListener('click', e => {
   e.stopPropagation();
@@ -889,18 +840,14 @@ el('settingsBtn').addEventListener('click', e => {
 });
 el('overlay').addEventListener('click', closeSettings);
 
-/* ═══════════════════════════════════════════
-   SETTINGS — DIRECTION
-═══════════════════════════════════════════ */
+/* ── Direction ── */
 function updateDirUI() {
   const { sourceLanguage:sl, targetLanguage:tl, sourceFlagEmoji:sf, targetFlagEmoji:tf } = LANG;
   if (S.reversed) {
-    el('drFlags').textContent = `${tf} → ${sf}`;
-    el('drText').textContent  = `${tl} → ${sl}`;
+    el('drFlags').textContent = `${tf} → ${sf}`; el('drText').textContent = `${tl} → ${sl}`;
     el('dirRow').classList.add('reversed');
   } else {
-    el('drFlags').textContent = `${sf} → ${tf}`;
-    el('drText').textContent  = `${sl} → ${tl}`;
+    el('drFlags').textContent = `${sf} → ${tf}`; el('drText').textContent = `${sl} → ${tl}`;
     el('dirRow').classList.remove('reversed');
   }
 }
@@ -913,16 +860,14 @@ function updateStartUI() {
     el('startH1').textContent = `${sl}–${tl} Sanastopeli`;
     el('langPill').innerHTML  = `${sf} ${sl} &nbsp;→&nbsp; ${tl} ${tf}`;
   }
-  const modeLabels = { write:'kirjoittamalla', multiple:'monivalinnalla', flash:'kääntökorteilla', build:'rakentamalla' };
+  const modeLabels = { write:'kirjoittamalla', multiple:'monivalinnalla', flash:'kääntökorteilla', build:'rakentamalla sanoja niiden kirjaimista' };
   const art = (S.mode !== 'build' && !S.reversed) ? '<br>Saat pisteen, vaikka artikkeli unohtuisi!' : '';
   el('startDesc').innerHTML = `Harjoittele sanastoa ${modeLabels[S.mode]}.${art}`;
 }
 el('dirRow').addEventListener('click', () => { S.reversed = !S.reversed; updateDirUI(); updateStartUI(); });
 el('dirRow').addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' ') { e.preventDefault(); el('dirRow').click(); } });
 
-/* ═══════════════════════════════════════════
-   BOTTOM NAV
-═══════════════════════════════════════════ */
+/* ── Bottom nav ── */
 ['nbFlash','nbBuild','nbMultiple','nbWrite'].forEach(id => {
   el(id).addEventListener('click', () => {
     S.mode = el(id).dataset.mode;
@@ -932,31 +877,24 @@ el('dirRow').addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' '
   });
 });
 
-/* ═══════════════════════════════════════════
-   GAME — START
-═══════════════════════════════════════════ */
+/* ── Game start ── */
 function startGame(wordsOverride) {
   let pool = wordsOverride ? [...wordsOverride] : [...VOCAB];
   if (S.mode === 'build') {
     pool = pool.filter(isBuildable);
-    if (pool.length === 0) pool = [...VOCAB].filter(isBuildable); // fallback
+    if (!pool.length) pool = [...VOCAB].filter(isBuildable);
   }
-  S.words = shuffle(pool);
-  S.wrong = []; S.idx = 0; S.score = 0; S.done = false;
+  S.words = shuffle(pool); S.wrong = []; S.idx = 0; S.score = 0; S.done = false;
   closeSettings();
   const screenMap = { write:'game', multiple:'game', flash:'flash', build:'build' };
   showScreen(screenMap[S.mode]);
-  const renderMap = { write: renderWord, multiple: renderWord, flash: renderFlash, build: renderBuild };
-  renderMap[S.mode]();
+  ({ write:renderWord, multiple:renderWord, flash:renderFlash, build:renderBuild })[S.mode]();
 }
 
-/* ═══════════════════════════════════════════
-   RESULTS
-═══════════════════════════════════════════ */
+/* ── Results ── */
 function showResults() {
   showScreen('results');
-  const total = S.words.length;
-  const pct   = Math.round((S.score / total) * 100);
+  const total = S.words.length, pct = Math.round((S.score/total)*100);
   el('resScore').textContent = `${S.score} / ${total}`;
   el('resPct').textContent   = `${pct}%`;
   if      (pct===100) { el('resEmoji').textContent='🏆'; el('resMsg').textContent='Täydellinen suoritus!'; }
@@ -966,26 +904,16 @@ function showResults() {
   if (S.wrong.length > 0) {
     el('btnWrong').classList.remove('hidden');
     el('btnWrong').textContent = `Harjoittele väärät uudelleen (${S.wrong.length}) 🔁`;
-  } else {
-    el('btnWrong').classList.add('hidden');
-  }
+  } else { el('btnWrong').classList.add('hidden'); }
 }
 
-/* ═══════════════════════════════════════════
-   SHARED FEEDBACK HELPER
-═══════════════════════════════════════════ */
 function showFb(fbId, type, html) {
-  const f = el(fbId);
-  f.className = `fb show ${type}`;
-  f.innerHTML = html;
+  const f = el(fbId); f.className = `fb show ${type}`; f.innerHTML = html;
 }
 
-/* ═══════════════════════════════════════════
-   WRITE & MULTIPLE CHOICE MODE
-═══════════════════════════════════════════ */
+/* ── Write & multiple choice ── */
 function renderWord() {
-  const w = S.words[S.idx];
-  S.done = false;
+  const w = S.words[S.idx]; S.done = false;
   el('progTxt').textContent  = `Sana ${S.idx+1} / ${S.words.length}`;
   el('scoreTxt').textContent = `Pisteet: ${S.score}`;
   el('progFill').style.width = `${(S.idx/S.words.length)*100}%`;
@@ -993,43 +921,33 @@ function renderWord() {
   el('wordTxt').textContent  = question(w);
   el('fb').className = 'fb'; el('fb').innerHTML = '';
   el('btnNext').classList.remove('vis');
-
   if (S.mode === 'write') {
-    el('writeWrap').classList.remove('hidden');
-    el('choiceWrap').classList.add('hidden');
+    el('writeWrap').classList.remove('hidden'); el('choiceWrap').classList.add('hidden');
     el('btnCheck').style.display = '';
     el('answerInput').value = ''; el('answerInput').disabled = false;
     setTimeout(() => el('answerInput').focus(), 80);
   } else {
-    el('writeWrap').classList.add('hidden');
-    el('choiceWrap').classList.remove('hidden');
+    el('writeWrap').classList.add('hidden'); el('choiceWrap').classList.remove('hidden');
     el('btnCheck').style.display = 'none';
     buildChoices(w);
   }
 }
-
 function checkWrite() {
   if (S.done) { advanceWord(); return; }
-  const w = S.words[S.idx];
-  const user = norm(el('answerInput').value);
+  const w = S.words[S.idx], user = norm(el('answerInput').value);
   if (!user) return;
-  const full = norm(answer(w));
-  const core = norm(answerCore(w));
-  const art  = articleOf(w);
+  const full = norm(answer(w)), core = norm(answerCore(w)), art = articleOf(w);
   let status;
-  if      (user === full)                              status = 'perfect';
-  else if (art && (user===core || user===norm(w.word))) status = 'partial';
-  else                                                 status = 'wrong';
-  el('answerInput').disabled = true;
-  el('btnCheck').style.display = 'none';
-  S.done = true;
-  if (status==='perfect') { S.score++; showFb('fb','ok',  `✅ <strong>Täysin oikein!</strong><br><em>${answer(w)}</em>`); }
+  if      (user === full)                                status = 'perfect';
+  else if (art && (user===core||user===norm(w.word)))    status = 'partial';
+  else                                                   status = 'wrong';
+  el('answerInput').disabled = true; el('btnCheck').style.display = 'none'; S.done = true;
+  if (status==='perfect') { S.score++; showFb('fb','ok',`✅ <strong>Täysin oikein!</strong><br><em>${answer(w)}</em>`); }
   else if (status==='partial') { S.score++; showFb('fb','warn',`⚠️ <strong>Oikein – muista artikkeli!</strong><br>Oikea muoto: <em>${answer(w)}</em>`); }
-  else { S.wrong.push(w); showFb('fb','err', `❌ <strong>Väärin.</strong> Oikea vastaus: <em>${answer(w)}</em>`); }
+  else { S.wrong.push(w); showFb('fb','err',`❌ <strong>Väärin.</strong> Oikea vastaus: <em>${answer(w)}</em>`); }
   el('scoreTxt').textContent = `Pisteet: ${S.score}`;
   el('btnNext').classList.add('vis'); el('btnNext').focus();
 }
-
 function buildChoices(correct) {
   const pool = VOCAB.filter(w => answer(w) !== answer(correct));
   const opts = shuffle([correct, ...shuffle(pool).slice(0,3)]);
@@ -1042,8 +960,7 @@ function buildChoices(correct) {
   });
 }
 function pickChoice(clicked, chosen, correct) {
-  if (S.done) return;
-  S.done = true;
+  if (S.done) return; S.done = true;
   const isOk = answer(chosen) === answer(correct);
   el('choicesGrid').querySelectorAll('.choice').forEach(b => {
     b.disabled = true;
@@ -1051,35 +968,50 @@ function pickChoice(clicked, chosen, correct) {
     else if (b===clicked && !isOk)                    b.classList.add('wrong');
     else                                               b.classList.add('dim');
   });
-  if (isOk) { S.score++; showFb('fb','ok', `✅ Oikein! <em>${answer(correct)}</em>`); }
-  else      { S.wrong.push(correct); showFb('fb','err',`❌ Väärin! Oikea: <em>${answer(correct)}</em>`); }
+  if (isOk) { S.score++; showFb('fb','ok',`✅ Oikein! <em>${answer(correct)}</em>`); }
+  else { S.wrong.push(correct); showFb('fb','err',`❌ Väärin! Oikea: <em>${answer(correct)}</em>`); }
   el('scoreTxt').textContent = `Pisteet: ${S.score}`;
   el('btnNext').classList.add('vis'); el('btnNext').focus();
 }
-
 function advanceWord() {
   S.idx++;
   if (S.idx >= S.words.length) showResults(); else renderWord();
 }
 
-/* ═══════════════════════════════════════════
+/* ─────────────────────────────────────────
    FLASHCARD MODE
-═══════════════════════════════════════════ */
+   FIX 1: disable transition on reset so the back
+   face never "flashes" through when advancing.
+───────────────────────────────────────────*/
 function renderFlash() {
   const w = S.words[S.idx];
   S.done = false; S.flipped = false;
-  el('fProgTxt').textContent  = `Kortti ${S.idx+1} / ${S.words.length}`;
-  el('fScoreTxt').textContent = `Pisteet: ${S.score}`;
-  el('fProgFill').style.width = `${(S.idx/S.words.length)*100}%`;
-  el('fDirHint').textContent  = langHint();
 
+  const card = el('card3d');
+
+  // 1. Kill transition so the flip-back is instant (no flash)
+  card.classList.add('no-transition');
+  card.classList.remove('flipped');
+
+  // 2. Update text content while card is face-forward
   const { sourceLanguage:sl, targetLanguage:tl } = LANG;
   el('cardFrontLabel').textContent = S.reversed ? tl : sl;
   el('cardBackLabel').textContent  = S.reversed ? sl : tl;
   el('cardFront').textContent = question(w);
   el('cardBack').textContent  = answer(w);
 
-  el('card3d').classList.remove('flipped');
+  // 3. Re-enable transition after browser has painted the reset
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      card.classList.remove('no-transition');
+    });
+  });
+
+  el('fProgTxt').textContent  = `Kortti ${S.idx+1} / ${S.words.length}`;
+  el('fScoreTxt').textContent = `Pisteet: ${S.score}`;
+  el('fProgFill').style.width = `${(S.idx/S.words.length)*100}%`;
+  el('fDirHint').textContent  = langHint();
+
   el('cardActions').classList.remove('vis');
   el('cardKeyHints').classList.remove('vis');
   el('cardTapHint').style.opacity = '1';
@@ -1105,237 +1037,172 @@ function flipCard() {
 function markCard(correct) {
   if (!S.flipped || S.done) return;
   S.done = true;
-  if (correct) S.score++;
-  else         S.wrong.push(S.words[S.idx]);
+  if (correct) S.score++; else S.wrong.push(S.words[S.idx]);
   el('fScoreTxt').textContent = `Pisteet: ${S.score}`;
   el('cardActions').classList.remove('vis');
   el('cardKeyHints').classList.remove('vis');
   el('cardTapHint').style.opacity = '1';
   el('cardTapHint').textContent = correct ? '✅ Merkitty oikein' : '❌ Merkitty väärin';
-  // Advance after short pause so user sees the result
   setTimeout(advanceFlash, 700);
 }
-
 function advanceFlash() {
   S.idx++;
   if (S.idx >= S.words.length) showResults(); else renderFlash();
 }
 
 el('cardScene').addEventListener('click', flipCard);
-el('cardScene').addEventListener('keydown', e => {
-  if (e.key === ' '          ) { e.preventDefault(); flipCard(); }
-});
+el('cardScene').addEventListener('keydown', e => { if (e.key===' ') { e.preventDefault(); flipCard(); } });
 el('btnCardRight').addEventListener('click', e => { e.stopPropagation(); markCard(true);  });
 el('btnCardWrong').addEventListener('click', e => { e.stopPropagation(); markCard(false); });
 
-/* ═══════════════════════════════════════════
-   WORD BUILDER MODE
-═══════════════════════════════════════════ */
+/* ── Word builder ── */
 function renderBuild() {
-  const w = S.words[S.idx];
-  S.done = false;
+  const w = S.words[S.idx]; S.done = false;
   S.buildTarget = S.reversed ? w.source : w.word;
   S.buildTiles  = shuffle(S.buildTarget.split('').map((char,i) => ({ char, id:i, used:false })));
   S.buildPlaced = [];
-
   el('bProgTxt').textContent  = `Sana ${S.idx+1} / ${S.words.length}`;
   el('bScoreTxt').textContent = `Pisteet: ${S.score}`;
   el('bProgFill').style.width = `${(S.idx/S.words.length)*100}%`;
   el('bDirHint').textContent  = langHint();
   el('buildQuestion').textContent = question(w);
-
-  // Article badge
-  const art = articleOf(w);
-  const artEl = el('buildArticle');
-  if (art && !S.reversed) {
-    artEl.textContent = art; artEl.style.display = '';
-  } else {
-    artEl.style.display = 'none';
-  }
-
+  const art = articleOf(w), artEl = el('buildArticle');
+  if (art && !S.reversed) { artEl.textContent = art; artEl.style.display = ''; }
+  else artEl.style.display = 'none';
   el('buildLenHint').textContent = `${S.buildTarget.length} kirjainta`;
   el('bFb').className = 'fb'; el('bFb').innerHTML = '';
-  el('btnBuildCheck').style.display = '';
-  el('btnBuildNext').classList.remove('vis');
+  el('btnBuildCheck').style.display = ''; el('btnBuildNext').classList.remove('vis');
   el('btnBuildClear').disabled = false;
-
-  renderBuildSlots();
-  renderBuildTiles();
+  renderBuildSlots(); renderBuildTiles();
 }
-
 function renderBuildSlots() {
-  const slotsEl = el('buildSlots');
-  slotsEl.innerHTML = '';
+  const slotsEl = el('buildSlots'); slotsEl.innerHTML = '';
   for (let i = 0; i < S.buildTarget.length; i++) {
     const slot = document.createElement('div');
     if (i < S.buildPlaced.length) {
       const tile = S.buildTiles.find(t => t.id === S.buildPlaced[i]);
-      slot.className = 'build-slot filled';
-      slot.textContent = tile.char;
+      slot.className = 'build-slot filled'; slot.textContent = tile.char;
       const idx = i;
       slot.addEventListener('click', () => { if (!S.done) removePlaced(idx); });
-    } else {
-      slot.className = 'build-slot empty';
-    }
+    } else { slot.className = 'build-slot empty'; }
     slotsEl.appendChild(slot);
   }
 }
-
 function renderBuildTiles() {
-  const tilesEl = el('buildTiles');
-  tilesEl.innerHTML = '';
+  const tilesEl = el('buildTiles'); tilesEl.innerHTML = '';
   S.buildTiles.forEach((tile, i) => {
     const t = document.createElement('div');
     t.className = 'build-tile' + (tile.used ? ' used' : '');
     t.textContent = tile.char;
-    if (!tile.used) {
-      t.addEventListener('click', () => { if (!S.done) placeTile(i); });
-    }
+    if (!tile.used) t.addEventListener('click', () => { if (!S.done) placeTile(i); });
     tilesEl.appendChild(t);
   });
 }
-
 function placeTile(i) {
   if (S.buildPlaced.length >= S.buildTarget.length) return;
-  S.buildTiles[i].used = true;
-  S.buildPlaced.push(S.buildTiles[i].id);
-  renderBuildSlots();
-  renderBuildTiles();
+  S.buildTiles[i].used = true; S.buildPlaced.push(S.buildTiles[i].id);
+  renderBuildSlots(); renderBuildTiles();
 }
-
 function removePlaced(slotIdx) {
   const tileId = S.buildPlaced[slotIdx];
   const tile = S.buildTiles.find(t => t.id === tileId);
   if (tile) tile.used = false;
   S.buildPlaced.splice(slotIdx, 1);
-  renderBuildSlots();
-  renderBuildTiles();
+  renderBuildSlots(); renderBuildTiles();
 }
-
 function clearBuild() {
-  S.buildTiles.forEach(t => t.used = false);
-  S.buildPlaced = [];
-  renderBuildSlots();
-  renderBuildTiles();
+  S.buildTiles.forEach(t => t.used = false); S.buildPlaced = [];
+  renderBuildSlots(); renderBuildTiles();
 }
-
 function checkBuild() {
   if (S.done) { advanceBuild(); return; }
-  if (S.buildPlaced.length < S.buildTarget.length) {
-    showFb('bFb','warn','⚠️ Lisää vielä kirjaimia!');
-    return;
-  }
+  if (S.buildPlaced.length < S.buildTarget.length) { showFb('bFb','warn','⚠️ Lisää vielä kirjaimia!'); return; }
   const userWord = S.buildTiles
     .filter(t => S.buildPlaced.includes(t.id))
     .sort((a,b) => S.buildPlaced.indexOf(a.id) - S.buildPlaced.indexOf(b.id))
     .map(t => t.char).join('');
-
   const correct = norm(userWord) === norm(S.buildTarget);
-  S.done = true;
-  el('btnBuildCheck').style.display = 'none';
-  el('btnBuildClear').disabled = true;
-
-  // Colour the slots
-  el('buildSlots').querySelectorAll('.build-slot.filled').forEach((slot, i) => {
-    slot.classList.remove('filled');
-    slot.classList.add(correct ? 'correct-slot' : 'wrong-slot');
+  S.done = true; el('btnBuildCheck').style.display = 'none'; el('btnBuildClear').disabled = true;
+  el('buildSlots').querySelectorAll('.build-slot.filled').forEach(slot => {
+    slot.classList.remove('filled'); slot.classList.add(correct ? 'correct-slot' : 'wrong-slot');
   });
-
   const w = S.words[S.idx];
-  if (correct) {
-    S.score++;
-    showFb('bFb','ok', `✅ <strong>Oikein!</strong> ${articleOf(w) ? articleOf(w)+' ' : ''}${S.buildTarget}`);
-  } else {
-    S.wrong.push(w);
-    showFb('bFb','err', `❌ <strong>Väärin.</strong> Oikea: <em>${answer(w)}</em>`);
-  }
+  if (correct) { S.score++; showFb('bFb','ok',`✅ <strong>Oikein!</strong> ${articleOf(w)?articleOf(w)+' ':''}${S.buildTarget}`); }
+  else { S.wrong.push(w); showFb('bFb','err',`❌ <strong>Väärin.</strong> Oikea: <em>${answer(w)}</em>`); }
   el('bScoreTxt').textContent = `Pisteet: ${S.score}`;
   el('btnBuildNext').classList.add('vis'); el('btnBuildNext').focus();
 }
-
-function advanceBuild() {
-  S.idx++;
-  if (S.idx >= S.words.length) showResults(); else renderBuild();
-}
+function advanceBuild() { S.idx++; if (S.idx >= S.words.length) showResults(); else renderBuild(); }
 
 el('btnBuildClear').addEventListener('click', clearBuild);
 el('btnBuildCheck').addEventListener('click', checkBuild);
 el('btnBuildNext').addEventListener('click',  advanceBuild);
 
-/* ═══════════════════════════════════════════
-   GLOBAL KEYBOARD (flashcard arrows, enter)
-═══════════════════════════════════════════ */
+/* ── Global keyboard ── */
 document.addEventListener('keydown', e => {
-  // Flashcard keyboard shortcuts
   if (S.mode==='flash' && el('flashScreen').classList.contains('active')) {
     if (e.key==='ArrowUp'||e.key==='ArrowDown') { e.preventDefault(); flipCard(); return; }
     if (e.key==='ArrowRight') { e.preventDefault(); markCard(true);  return; }
     if (e.key==='ArrowLeft')  { e.preventDefault(); markCard(false); return; }
   }
-  // Enter in write mode
   if (S.mode==='write' && el('gameScreen').classList.contains('active')) {
-    if (e.key==='Enter') {
-      e.preventDefault();
-      if (!S.done) checkWrite(); else advanceWord();
-    }
+    if (e.key==='Enter') { e.preventDefault(); if (!S.done) checkWrite(); else advanceWord(); }
   }
 });
 
-/* ═══════════════════════════════════════════
-   RESULTS BUTTONS & SHARED EVENTS
-═══════════════════════════════════════════ */
+/* ── Shared buttons ── */
 el('btnGo').addEventListener('click',      () => startGame());
 el('btnCheck').addEventListener('click',   checkWrite);
 el('btnNext').addEventListener('click',    advanceWord);
 el('btnRestart').addEventListener('click', () => startGame());
 el('btnWrong').addEventListener('click',   () => startGame([...S.wrong]));
 el('btnQuit').addEventListener('click',    () => { closeSettings(); showScreen('start'); updateStartUI(); });
-
 el('answerInput').addEventListener('keydown', e => {
-  if (e.key !== 'Enter') return;
-  e.preventDefault();
+  if (e.key !== 'Enter') return; e.preventDefault();
   if (!S.done) checkWrite(); else advanceWord();
 });
 
-/* ═══════════════════════════════════════════
-   iOS HINT
-═══════════════════════════════════════════ */
+/* ── iOS hint ── */
 if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !navigator.standalone) {
   el('iosHint').style.display = 'block';
 }
 
+/* ── Init ── */
+updateDirUI(); updateStartUI();
+
 /* ═══════════════════════════════════════════
-   INIT
+   LOADER  (FIX 2: minimum 1 second display)
 ═══════════════════════════════════════════ */
-updateDirUI();
-updateStartUI();
+(function () {
+  const loader    = el('appLoader');
+  const bar       = el('loaderBarFill');
+  const startTime = Date.now();
+  const MIN_MS    = 1000;   // ← 1 sekunnin miniimi
+
+  let progress = 0;
+  const tick = setInterval(() => {
+    progress += Math.random() * 18 + 4;
+    if (progress > 88) progress = 88;
+    bar.style.width = progress + '%';
+  }, 140);
+
+  function dismiss() {
+    clearInterval(tick);
+    bar.style.width = '100%';
+    // Fade out after a short moment so the full bar is visible
+    setTimeout(() => loader.classList.add('hide'), 350);
+  }
+
+  window.addEventListener('load', () => {
+    const elapsed = Date.now() - startTime;
+    const remaining = MIN_MS - elapsed;
+    if (remaining > 0) setTimeout(dismiss, remaining);
+    else dismiss();
+  });
+
+  // Failsafe: always hide after 4 seconds even if load event misfires
+  setTimeout(dismiss, 4000);
+})();
 </script>
-
-<script>
-/* ═══════════════════════════════════════════
-   LOADER LOGIC
-═══════════════════════════════════════════ */
-
-const loader = document.getElementById("appLoader");
-const loaderBar = document.getElementById("loaderBarFill");
-
-let progress = 0;
-
-const fakeLoad = setInterval(() => {
-  progress += Math.random() * 20;
-  if (progress > 90) progress = 90;
-  loaderBar.style.width = progress + "%";
-}, 180);
-
-window.addEventListener("load", () => {
-  clearInterval(fakeLoad);
-  loaderBar.style.width = "100%";
-
-  setTimeout(() => {
-    loader.classList.add("hide");
-  }, 400);
-});
-</script>
-
 </body>
 </html>
